@@ -1,19 +1,27 @@
-import request from '@/utils/request'
+import request from "@/utils/request";
 
 export default {
-  getTeacherListPage(current, limit, teacherQuerry){
+  getTeacherListPage(current, limit, teacherQuerry) {
     return request({
       // url: '/eduservice/edu-teacher/'+ current ,
-      url: `/eduservice/edu-teacher/pageTeacherCondition/${current}/${limit}` ,
-      method: 'post',
-      data: teacherQuerry
-    })
+      url: `/eduservice/edu-teacher/pageTeacherCondition/${current}/${limit}`,
+      method: "post",
+      data: teacherQuerry,
+    });
   },
 
-  deleteTeacherById(id){
+  deleteTeacherById(id) {
     return request({
-      url: `/eduservice/edu-teacher/${id}` ,
-      method: 'delete'
-    })
-  }
-}
+      url: `/eduservice/edu-teacher/${id}`,
+      method: "delete",
+    });
+  },
+
+  addTeacher(teacher) {
+    return request({
+      url: `/eduservice/edu-teacher/addTeacher`,
+      method: "post",
+      data: teacher,
+    });
+  },
+};
