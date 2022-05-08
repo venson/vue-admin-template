@@ -22,14 +22,14 @@
         <el-input v-model="teacher.intro" :rows="10" type="textarea" />
       </el-form-item>
 
+
       <!--avatar of teachers-->
       <el-form-item>
         <el-button
           :disabled="saveBtnDisabled"
           type="primary"
           @click="saveOrUpdate"
-          >保存</el-button
-        >
+          >保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -42,22 +42,55 @@ export default {
     return {
       teacher: {},
       saveBtnDisabled: false,
-    };
+    }
   },
-  created() {},
+  created() {
+
+    // get the id of the teacher if the url have id
+    if(this.$route.params && this.$route.params.id){
+      const id = this.$route.params.id
+      this.getTeacherInfoById(id)
+      console.log(id)
+    }
+  },
   methods: {
-    saveOrUpdate() {
-      this.saveTeacher();
+    // get the teacher infomation by id
+    getTeacherInfoById(id){
+      teacherApi.getTeacherInfoById(id)
+      .then(response =>{
+          this.teacher = response.data.teacher
+        })
     },
+
+    // save or update teacher infomation
+    saveOrUpdate() {
+      if (!this.teacher.id ){
+      this.saveTeacher();
+      }else{
+        this.updateTeacherInfo()
+      }
+    },
+    updateTeacherInfo(){
+      teacherApi.updateTeacher(this.teacher)
+      .then(response =>{
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          })
+          this.$router.push({path: '/teacher/list'})
+        })
+    },
+
+  // save teacher infomation
     saveTeacher() {
       teacherApi.addTeacher(this.teacher).then((response) => {
         this.$message({
           type: "success",
           message: "添加成功",
         });
-        this.$router.push({ path: "/teacher/list" });
-      });
-    },
-  },
-};
+        this.$router.push({ path: "/teacher/list" })
+      })
+    }
+  }
+}
 </script>
