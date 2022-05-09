@@ -21,9 +21,23 @@
       <el-form-item label="教师简介">
         <el-input v-model="teacher.intro" :rows="10" type="textarea" />
       </el-form-item>
-
-
       <!--avatar of teachers-->
+      <el-form-item label="教师头像">
+
+        <pan-thumb :image="teacher.avatar" />
+        <el-button type="primary" icon="el-icon-upload" @click="imagecropperShow=true">
+        </el-button>
+          <image-cropper
+          v-show="imagecropperShow"
+          :width="300"
+          :height="300"
+          :key="imagecropperKey"
+          :url="BASE_API + 'eduoss/fileoss'"
+          field="file"
+          @close="close"
+          @crop-upload-success="cropSuccess"/>
+
+      </el-form-item>
       <el-form-item>
         <el-button
           :disabled="saveBtnDisabled"
@@ -36,15 +50,24 @@
 </template>
 
 <script>
-import teacherApi from "@/api/edu/teacher";
+import teacherApi from '@/api/edu/teacher'
+import ImageCropper from '@/components/ImageCropper'
+import PanThumb from '@/components/PanThumb'
 export default {
+  components: {ImageCropper, PanThumb},
   data() {
     return {
-      teacher: {},
+      teacher: {
+        avatar: '',
+      },
+      imagecropperShow: false,
+      imagecropperKey: 0,
       saveBtnDisabled: false,
+      BASE_API: process.env.VUE_APP_BASE_API
     }
   },
   created() {
+    console.log(this.BASE_API)
 
     // get the id of the teacher if the url have id
     if(this.$route.params && this.$route.params.id){
@@ -54,6 +77,15 @@ export default {
     }
   },
   methods: {
+    close(){
+      this.imagecropperShow = false
+
+    },
+    cropSuccess(data){
+      this.close(),
+      this.teacher.avatar = data.url
+
+    },
     // get the teacher infomation by id
     getTeacherInfoById(id){
       teacherApi.getTeacherInfoById(id)
