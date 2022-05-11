@@ -1,0 +1,183 @@
+<template>
+  <div class="app-container">
+    <h2 style="text-align: center">发布新课程</h2>
+    <el-steps
+      :active="1"
+      process-status="wait"
+      align-center
+      style="margin: bottom 4px"
+      finish-status="success"
+    >
+      <el-step title="填写课程基本信息"></el-step>
+      <el-step title="创建课程大纲"></el-step>
+      <el-step title="最终发布"></el-step>
+    </el-steps>
+
+    <el-form label-width="120px">
+      <el-form-item label="课程标题">
+        <el-input
+          v-model="courseInfo.title"
+          placeholder=" 示例：机器学习项目课：从基础到搭建项目视频课程。专业名称注意大小写"
+        />
+      </el-form-item>
+      <!-- 所属分类 TODO -->
+      <el-form-item label="课程分类">
+        <el-select
+          v-model="courseInfo.subjectParentId"
+          @change="getLevelISubjectList"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="subject in topSubjectList"
+            :key="subject.id"
+            :label="subject.title"
+            :value="subject.id"
+          />
+        </el-select>
+        <el-select v-model="courseInfo.subjectId" placeholder="请选择">
+          <el-option
+            v-for="subject in levelISubjectList"
+            :key="subject.id"
+            :label="subject.title"
+            :value="subject.id"
+          />
+        </el-select>
+      </el-form-item>
+      <!-- 课程讲师 TODO -->
+      <el-form-item label="课程教师">
+        <el-select v-model="courseInfo.teacherId" placeholder="请选择">
+          <el-option
+            v-for="teacher in teacherList"
+            :key="teacher.id"
+            :label="teacher.name"
+            :value="teacher.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="总课时">
+        <el-input-number
+          :min="0"
+          v-model="courseInfo.lessonNum"
+          controls-position="right"
+          placeholder="请填写课程的总课时数"
+        />
+      </el-form-item>
+      <!-- 课程简介 TODO -->
+      <el-form-item label="课程简介">
+        <el-input v-model="courseInfo.description" placeholder=" 示例：" />
+      </el-form-item>
+      <!-- 课程封面 TODO -->
+      <el-form-item label="课程封面">
+        <el-upload
+          :show-file-list="false"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload"
+          :action="BASE_API + '/eduoss/fileoss'"
+          class="avatar-uploader">
+          <img v-if="courseInfo.cover" :src="courseInfo.cover" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+      </el-form-item>
+
+      <el-form-item label="课程价格">
+        <el-input-number
+          :min="0"
+          v-model="courseInfo.price"
+          controls-position="right"
+          placeholder="免费课程请设置为0元"
+        />
+        元
+      </el-form-item>
+      <el-form-item>
+        <el-button :disabled="saveBtnDisabled" type="primary" @click="next"
+          >保存并下一步</el-button
+        >
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
+<script>
+import course from "@/api/edu/course";
+import subject from "@/api/edu/subject";
+export default {
+  data() {
+    return {
+      saveBtnDisabled: false,
+      courseInfo: {
+        title: "",
+        subjectId: "",
+        subjectParentId: "",
+        teacherId: "",
+        lessonNum: "",
+        description: "",
+        cover: "",
+        price: 0,
+      },
+      teacherList: [],
+      topSubjectList: [],
+      levelISubjectList: [],
+      BASE_API: process.env.VUE_APP_BASE_API,
+    };
+  },
+  created() {
+    this.getTeacherList();
+    this.getTopSubject();
+  },
+  methods: {
+    handleAvatarSuccess(res, file){
+      this.courseInfo.cover = res.data.url
+
+    },
+    beforeAvatarUpload(file){
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 /1024 <2
+      if (!isJPG){
+        this.$message.error("上传头图片只能是JPG格式")
+      }
+      if (!isLt2M){
+        this.$message.error("上传头像图片大小不能超过2MB")
+      }
+      return isJPG && isLt2M
+
+    },
+    getLevelISubjectList(value) {
+      console.log(value);
+      for (let i = 0; i < this.topSubjectList.length; i++) {
+        if (this.topSubjectList[i].id == value) {
+          this.levelISubjectList = this.topSubjectList[i].children;
+          this.courseInfo.subjectId = this.levelISubjectList[0].id;
+          break;
+        }
+      }
+      console.log(this.levelISubjectList);
+    },
+    getTopSubject() {
+      subject.getSubjectList().then((response) => {
+        this.topSubjectList = response.data.list;
+      });
+    },
+    getTeacherList() {
+      course.getTeacherList().then((response) => {
+        this.teacherList = response.data.items;
+      });
+    },
+    next() {
+      course.addCourseInfo(this.courseInfo).then((response) => {
+        this.$message({
+          type: "success",
+          message: "添加成功",
+        });
+        this.$router.push({
+          path: "/course/chapter/" + response.data.courseId,
+        });
+      });
+    },
+  },
+};
+</script>
+<style lang="scss">
+@import '@/styles/upload.scss'
+
+</style>
+
