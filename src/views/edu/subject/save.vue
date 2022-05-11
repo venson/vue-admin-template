@@ -62,6 +62,7 @@ export default {
         type: 'success',
         message: '添加成功'
       })
+      this.$route.push({path:'/subject/list'})
 
     },
     fileUploadError(){
