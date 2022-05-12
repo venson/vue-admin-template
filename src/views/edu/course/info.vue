@@ -65,6 +65,8 @@
       <!-- 课程简介 TODO -->
       <el-form-item label="课程简介">
         <el-input v-model="courseInfo.description" placeholder=" 示例：" />
+          <Tinymce :height="200" v-model="courseInfo.description"
+          />
       </el-form-item>
       <!-- 课程封面 TODO -->
       <el-form-item label="课程封面">
@@ -73,8 +75,9 @@
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
           :action="BASE_API + '/eduoss/fileoss'"
-          class="avatar-uploader">
-          <img v-if="courseInfo.cover" :src="courseInfo.cover" class="avatar">
+          class="avatar-uploader"
+        >
+          <img v-if="courseInfo.cover" :src="courseInfo.cover" class="avatar" />
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
@@ -100,7 +103,13 @@
 <script>
 import course from "@/api/edu/course";
 import subject from "@/api/edu/subject";
+import Tinymce from "@/components/Tinymce";
+
 export default {
+  name: "app",
+  components: {
+    Tinymce
+  },
   data() {
     return {
       saveBtnDisabled: false,
@@ -114,6 +123,7 @@ export default {
         cover: "",
         price: 0,
       },
+      courseId: "",
       teacherList: [],
       topSubjectList: [],
       levelISubjectList: [],
@@ -121,25 +131,38 @@ export default {
     };
   },
   created() {
+    if (this.$route.params && this.$route.params.id){
+      this.courseId=this.$route.params.id
+      this.getCourseInfo()
+
+    }
     this.getTeacherList();
     this.getTopSubject();
   },
   methods: {
-    handleAvatarSuccess(res, file){
-      this.courseInfo.cover = res.data.url
-
+    updateCouseInfo(){
+      course.updateCouseInfo(courseInfo)
     },
-    beforeAvatarUpload(file){
-      const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 /1024 <2
-      if (!isJPG){
-        this.$message.error("上传头图片只能是JPG格式")
-      }
-      if (!isLt2M){
-        this.$message.error("上传头像图片大小不能超过2MB")
-      }
-      return isJPG && isLt2M
 
+    getCourseInfo(){
+      course.getCourseInfo(this.courseId)
+      .then(response => {
+        this.courseInfo = response.data.course
+      })
+    },
+    handleAvatarSuccess(res, file) {
+      this.courseInfo.cover = res.data.url;
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG) {
+        this.$message.error("上传头图片只能是JPG格式");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过2MB");
+      }
+      return isJPG && isLt2M;
     },
     getLevelISubjectList(value) {
       console.log(value);
@@ -163,7 +186,13 @@ export default {
       });
     },
     next() {
+
+      if(this.courseId){
+        this.
+
+      }
       course.addCourseInfo(this.courseInfo).then((response) => {
+        console.log(this.courseInfo)
         this.$message({
           type: "success",
           message: "添加成功",
@@ -177,7 +206,10 @@ export default {
 };
 </script>
 <style lang="scss">
-@import '@/styles/upload.scss'
-
+@import "@/styles/upload.scss";
 </style>
-
+<style scoped>
+.tinymce-container {
+  line-height: 29px;
+}
+</style>

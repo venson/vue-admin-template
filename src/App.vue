@@ -5,7 +5,11 @@
 </template>
 
 <script>
+import Editor from "@tinymce/tinymce-vue";
 export default {
-  name: 'App'
-}
+  name: "app",
+  component: {
+    editor: Editor,
+  },
+};
 </script>

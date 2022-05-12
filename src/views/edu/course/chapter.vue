@@ -12,37 +12,27 @@
       <el-step title="创建课程大纲"></el-step>
       <el-step title="最终发布"></el-step>
     </el-steps>
+
+    <ul>
+      <li v-for="chapter in chapterVideoList" :key="chapter.id">
+        {{chapter.title}}
+          <ul>
+            <li v-for="video in chapter.children" :key="video.id">
+            {{video.title}}
+            </li>
+          </ul>
+        </li>
+    </ul>
+
+
+
     <el-form label-width="120px">
-      <el-form-item label="课程标题">
-        <el-input
-          v-model="courseInfo.title"
-          placeholder=" 示例：机器学习项目课：从基础到搭建项目视频课程。专业名称注意大小写"
-        />
-      </el-form-item>
-      <!-- 所属分类 TODO -->
-      <!-- 课程讲师 TODO -->
-      <el-form-item label="总课时">
-        <el-input-number
-          :min="0"
-          v-model="courseInfo.lessonNum"
-          controls-position="right"
-          placeholder="请填写课程的总课时数"
-        />
-      </el-form-item>
-      <!-- 课程简介 TODO -->
-      <!-- 课程封面 TODO -->
-      <el-form-item label="课程价格">
-        <el-input-number
-          :min="0"
-          v-model="courseInfo.price"
-          controls-position="right"
-          placeholder="免费课程请设置为0元"
-        />
-        元
-      </el-form-item>
+
       <el-form-item>
+        <el-button :disabled="saveBtnDisabled" type="primary" @click="previous"
+          >上一部</el-button>
         <el-button :disabled="saveBtnDisabled" type="primary" @click="next"
-          >保存并下一步</el-button
+          >下一步</el-button
         >
       </el-form-item>
     </el-form>
@@ -50,28 +40,34 @@
 </template>
 
 <script>
+import chapter from '@/api/edu/chapter'
 export default {
   data() {
     return {
       saveBtnDisabled: false,
-      courseInfo: {
-        title: "",
-        subjectId: "",
-        teacherId: "",
-        lessonNum: "",
-        description: "",
-        cover: "",
-        price: 0,
-      },
+      courseId: "",
+      chapterVideoList: []
     };
   },
-  created() {},
+  created() {
+    if(this.$route.params && this.$route.params.id){
+      this.courseId = this.$route.params.id
+      console.log(this.courseId)
+    }
+    this.getChapterVideo()
+  },
   methods: {
+    getChapterVideo(){
+      chapter.getChapterVideo(this.courseId)
+        .then(response =>{
+          this.chapterVideoList = response.data.list
+        })
+    },
     previous() {
-      this.$router.push({ path: "/course/info/1" });
+      this.$router.push({ path: `/course/info/${this.courseId}` });
     },
     next() {
-      this.$router.push({ path: "/course/publish/1" });
+      this.$router.push({ path: `/course/publish/${this.courseId}` });
     },
   },
 };
