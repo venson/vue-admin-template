@@ -133,21 +133,34 @@ export default {
   created() {
     if (this.$route.params && this.$route.params.id){
       this.courseId=this.$route.params.id
-      this.getCourseInfo()
-
+      this.getInfo()
+    }else{
+    this.getTopSubject()
+    this.getTeacherList()
     }
-    this.getTeacherList();
-    this.getTopSubject();
   },
   methods: {
     updateCouseInfo(){
       course.updateCouseInfo(courseInfo)
     },
 
-    getCourseInfo(){
+    getInfo(){
       course.getCourseInfo(this.courseId)
       .then(response => {
         this.courseInfo = response.data.course
+          subject.getSubjectList()
+          .then(response=> {
+              this.topSubjectList= response.data.list
+              console.log(this.topSubjectList)
+              for(let i=0; i<this.topSubjectList.length;i++){
+                let topSubject = this.topSubjectList[i]
+                if (topSubject.id === this.courseInfo.subjectParentId){
+                  this.levelISubjectList = topSubject.children
+                }
+              }
+            })
+        this.getTeacherList()
+          .then(response =>{})
       })
     },
     handleAvatarSuccess(res, file) {
@@ -186,11 +199,13 @@ export default {
       });
     },
     next() {
-
-      if(this.courseId){
-        this.
-
+      if(this.courseInfo.id){
+        this.updateCourse()
+      }else{
+        this.addCourse()
       }
+    },
+    addCourse(){
       course.addCourseInfo(this.courseInfo).then((response) => {
         console.log(this.courseInfo)
         this.$message({
@@ -202,6 +217,18 @@ export default {
         });
       });
     },
+    updateCourse(){
+      course.updateCourseInfo(this.courseInfo).then((response) => {
+        console.log(this.courseInfo)
+        this.$message({
+          type: "success",
+          message: "修改成功",
+        });
+        this.$router.push({
+          path: "/course/chapter/" + this.courseId,
+        });
+      });
+    }
   },
 };
 </script>
