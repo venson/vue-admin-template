@@ -86,9 +86,9 @@
   <el-pagination
     :current-page="page"
     :page-size="limit"
-    @size-change="page"
+    @size-change="handleSizeChange"
     @current-change="getList"
-    :page-sizes="[10, 20, 30, 40]"
+    :page-sizes="[5,10, 20, 30, 40]"
     layout="total, sizes, prev, pager, next, jumper"
     :total="total">
   </el-pagination>
@@ -107,7 +107,7 @@ export default{
     return {
       list:null,
       page:1,
-      limit: 10,
+      limit: 5,
       total: 0,
       teacherQuery:{}
     }
@@ -117,6 +117,10 @@ export default{
 
   },
   methods:{
+    handleSizeChange(val){
+      this.limit = val
+      this.getList(this.page)
+    },
     getList(page=1){
       this.page=page
       teacher.getTeacherListPage(this.page,this.limit, this.teacherQuery)
@@ -144,7 +148,7 @@ export default{
           type: 'warning'
         }).then(() => {
             teacher.deleteTeacherById(id)
-            .then(response => {
+            .then(() => {
                 this.$message({
                   type: 'success',
                   message: '删除成功!'
