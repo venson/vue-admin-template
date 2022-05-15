@@ -3,7 +3,7 @@
     课程列表
     <el-form :inline="true" class="demo-form-inline">
       <el-form-item>
-        <el-input v-model="courseList.condition" placeholder="查询"></el-input>
+        <el-input v-model="condition" placeholder="查询"></el-input>
       </el-form-item>
 
       <el-button type="primary" icon="el-icon-search" @click="getCourseList()">查询</el-button>
@@ -53,7 +53,7 @@ import course from '@/api/edu/course'
 export default {
   data() {
     return {
-      courseList: {},
+      courseList: null,
       page: 1,
       limit: 8,
       condition: "",
@@ -74,6 +74,7 @@ export default {
       this.page = page
       course.getCourseList(this.page, this.limit, this.condition)
         .then(response => {
+          console.log(response)
           this.courseList = response.data.row
           this.total = response.data.total
         })

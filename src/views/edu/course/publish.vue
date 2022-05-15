@@ -34,8 +34,7 @@ import course from '@/api/edu/course';
 export default {
   data() {
     return {
-      coursePublish:{
-        cover: "",
+      coursePublish: {
       },
       saveBtnDisabled: false,
     };
@@ -64,7 +63,7 @@ export default {
             type: 'success',
             message: "发布成功"
           })
-          this.$router.push({path: `/curse/list`})
+          this.$router.push({path: `/course/list`})
         })
     },
   },
