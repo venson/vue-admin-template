@@ -1,128 +1,94 @@
 <template>
-  <div class="app-container">
-    <h2 style="text-align: center">发布新课程</h2>
-    <el-steps
-      :active="2"
-      process-status="wait"
-      align-center
-      style="margin: bottom 4px"
-      finish-status="success"
-    >
-      <el-step title="填写课程基本信息"></el-step>
-      <el-step title="创建课程大纲"></el-step>
-      <el-step title="最终发布"></el-step>
-    </el-steps>
-    <el-button type="text" @click="dialogChapterButton()">添加章节</el-button>
-    
-    <!-- 章节 -->
-    <ul class="chapterList" dialogChaptedialo>
-      <li v-for="chapter in chapterVideoList" :key="chapter.id">
-        <p>
-          {{ chapter.title }}
-          <span class="acts">
-            <!-- <el-button type="text">添加课时</el-button> -->
-            <el-button stple="" type="text" @click="dialogAddVideo(chapter.id)"
-              >添加小节</el-button
-            >
-            <el-button
-              style=""
-              type="text"
-              @click="dialogEditChapter(chapter.id)"
-              >编辑</el-button
-            >
-            <el-button type="text" @click="removeChapter(chapter.id)"
-              >删除</el-button
-            >
-          </span>
-        </p>
-        <!-- 视频 -->
-        <ul class="chanpterList videoList">
-          <li v-for="video in chapter.children" :key="video.id">
-            <p>
-              {{ video.title }}
-              <span class="acts">
-                <el-button type="text" @click="dialogEditVideo(video.id)">编辑</el-button>
-                <el-button type="text" @click="deleteVideo(video.id)">删除</el-button>
+  <div>
+    <el-container class="app-container">
+      <el-header height="140px">
+        <h2 style="text-align: center">New Course</h2>
+        <el-steps :active="2" process-status="wait" align-center style="margin: bottom 4px" finish-status="success">
+          <el-step title="Course Base Info"></el-step>
+          <el-step title="Edit Course"></el-step>
+          <el-step title="Publish"></el-step>
+        </el-steps>
+      </el-header>
+      <el-container height="700px">
+        <el-aside width="260px">
+          <el-button type="text" @click="newChapter">New Chapter</el-button>
+          <el-tree :data="chapterSectionList" node-key="id" default-expand-all :props="props"
+            :expand-on-click-node="false">
+            <!-- <span class="custom-tree-node" slot-scope="{ node, data }"> -->
+            <span class="custom-tree-node" style="width:200px;height:28px" slot-scope="{ node, data }">
+              <span style="display:inline-block"> {{ node.label }}</span>
+              <span style="position:absolute;right:0px">
+                <el-button v-if="node.level === 1" type="text" size="mini" @click="newSection(node)">
+                  New
+                </el-button>
+                <el-button type="text" size="mini" @click="editChapterSection(node, data)">
+                  <i class="el-icon-edit"></i>
+                </el-button>
+                <el-button type="text" size="mini" @click="() => remove(node, data)">
+                  <i class="el-icon-delete"></i>
+                </el-button>
+
               </span>
-            </p>
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <div>
-      <el-button @click="previous">上一步</el-button>
-      <el-button :disabled="saveBtnDisabled" type="primary" @click="next"
-        >下一步</el-button
-      >
-    </div>
+            </span>
+          </el-tree>
+        </el-aside>
+        <el-main>
+          <!-- chapter section form -->
+          <el-form :model="editData">
+            <el-form-item :label="editData.label" label-width="60px">
+              <el-input v-model="editData.title" />
+            </el-form-item>
 
-    <el-dialog :visible.sync="dialogChapterFormVisible" title="添加章节">
-      <el-form :model="chapter" label-width="120px">
-        <el-form-item label="章节标题">
-          <el-input v-model="chapter.title" />
-        </el-form-item>
-        <el-form-item label="章节排序">
-          <el-input-number
-            v-model="chapter.sort"
-            :min="0"
-            controls-position="right"
-          />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogChapterFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveOrUpdate">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 添加和修改课时表单 -->
-    <el-dialog :visible.sync="dialogVideoFormVisible" title="添加小节">
-      <el-form :model="video" label-width="120px">
-        <el-form-item label="小节标题">
-          <el-input v-model="video.title" />
-        </el-form-item>
-        <el-form-item label="小节排序">
-          <el-input-number
-            v-model="video.sort"
-            :min="0"
-            controls-position="right"
-          />
-        </el-form-item>
-        <el-form-item label="是否免费">
-          <el-radio-group v-model="video.isFree">
-            <el-radio :label=1>免费</el-radio>
-            <el-radio :label=0>默认</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="上传视频">
-          <!-- TODO -->
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVideoFormVisible = false">取 消</el-button>
-        <el-button
-          :disabled="saveVideoBtnDisabled"
-          type="primary"
-          @click="saveOrUpdateVideo"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
+            <el-form-item v-if="editData.level === 2" label="Bilibili" label-width="60px">
+              <el-input v-model="editData.videoLink" />
+            </el-form-item>
+            <el-form-item label="Sort" label-width="60px">
+              <el-input class="el-input-sort" v-model="editData.sort" />
+              <el-button type="success" style="margin-left:20px" @click="saveOrUpdate()">Save</el-button>
+            </el-form-item>
+          </el-form>
+          <!-- Markdown editor -->
+          <v-md-editor v-model="editData.content" :left-toolbar="lefttoolbar" :disabled-menus="[]" highlight-current
+            @upload-image="handleUploadImage" height="800px"></v-md-editor>
+          <div>
+            <el-button @click="previous">上一步</el-button>
+            <el-button :disabled="saveBtnDisabled" type="primary" @click="next">下一步</el-button>
+          </div>
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
 <script>
-import chapter from "@/api/edu/chapter";
-import video from "@/api/edu/video";
+import chapterApi from '@/api/edu/chapter'
+import contentApi from '@/api/edu/content'
+import sectionApi from '@/api/edu/section'
+import ossApi from '@/api/oss'
 export default {
   data() {
     return {
+      props: {
+        label: 'title',
+        isLeaf: 'isLeaf'
+      },
+
+      lefttoolbar: "undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | save",
       saveBtnDisabled: false,
       courseId: "",
-      chapterVideoList: [],
-      video: {
+      chapterSectionList: [],
+      section: {
         title: "",
-        id:"",
+      },
+      content: {
+        id: '',
+        chapterSectionId: '',
+        chapterSection: '',
+        content: ''
+      },
+      section: {
+        title: "",
+        id: "",
         sort: 0,
         courseId: "",
         chapterId: "",
@@ -133,148 +99,336 @@ export default {
         title: "",
         sort: 0,
       },
-      dialogChapterFormVisible: false,
-      dialogVideoFormVisible: false,
-      saveVideoBtnDisabled: false,
+      editData: {
+        label: 'Title',
+        edit: false,
+        id: '',
+        parentId: '',
+        level: '',
+        title: '',
+        content: '',
+        sort: '',
+        videoLink: '',
+      },
+
+      saveSectionBtnDisabled: false,
     };
   },
   created() {
     if (this.$route.params && this.$route.params.id) {
       this.courseId = this.$route.params.id
       console.log("courseId at start:" + this.courseId)
-      this.getChapterVideo()}
+      this.getChapterSection()
+    }
   },
   methods: {
-    getVideo(id){
-      video.getVideo(id)
-      .then(response =>{
-          console.log(response)
-        this.video = response.data.item
+    editChapterSection(node, data) {
+      this.editData.level = node.level
+      this.editData.id = data.id
+      console.log("data")
+      console.log(data)
+      console.log("node")
+      console.log(node)
+      if (this.isChapter(node)) {
+        this.editData.label = 'Chapter'
+        this.getChapter(data.id)
+        this.getChapterContent(data.id)
+      } else {
+        this.editData.label = 'Section'
+        this.getSection(data.id)
+        this.getSectionContent(data.id)
+      }
+
+      console.log(this.editData)
+    },
+
+    isChapter(node) {
+      return node.level === 1
+    },
+    isSection(node) {
+      return node.level === 2
+    },
+
+    remove(node, data) {
+      const parent = node.parent;
+      const children = parent.data.children || parent.data;
+      const index = children.findIndex(d => d.id === data.id);
+      children.splice(index, 1);
+    },
+    handleUploadImage(event, insertImage, files) {
+
+      var formdata = new FormData()
+      formdata.append('file', files[0])
+      let url = '';
+      let desc = files[0].name;
+      ossApi.uploadImage(formdata)
+        .then(response => {
+          console.log(response.data)
+          url = response.data.url
+          insertImage({
+            url: url,
+            desc: desc
+          });
+        })
+
+    },
+    getSection(id) {
+      return Promise.resolve(
+        sectionApi.getSection(id)
+          .then(response => {
+            this.section = response.data.item;
+            this.editData.title = this.section.title
+            this.editData.sort = this.section.sort
+            this.editData.videoLink = this.section.videoLink
+          }))
+
+    },
+    getChapter(id) {
+      return Promise.resolve(
+        chapterApi.getChapter(id)
+          .then(response => {
+            this.chapter = response.data.item;
+            this.editData.title = this.chapter.title
+            this.editData.sort = this.chapter.sort
+            this.editData.videoLink = ''
+          }))
+    },
+    //  Deleting Section by id
+    deleteSection(id) {
+      this.$confirm("确认删除?", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: 'warning'
+      }).then(response => {
+        section.deleteSection(id).then(response => {
+          this.getChapterSection()
+        })
       })
 
     },
-     //  Deleting Video by id
-    deleteVideo(id){
-      this.$confirm("确认删除?","提示",{
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: 'warning'}).then(response =>{
-          video.deleteVideo(id).then(response=>{
-          this.getChapterVideo()
-          })
-        })
-
-    },
     // save or update button function
-    saveOrUpdateVideo(){
-      if(this.video.id){
+    saveOrUpdateSection() {
+      if (this.section.id) {
         console.log("update")
-        this.updateVideo()
-      }else{
+        this.updateSection()
+      } else {
         console.log("add")
-        this.addVideo()
+        this.addSection()
       }
-      this.dialogVideoFormVisible=false
+      this.dialogSectionFormVisible = false
+    },
+    // init  editData
+    initNewEditData() {
+      this.editData.content = ''
+      this.editData.title = ''
+      this.editData.sort = 0
+      this.content.id = ''
     },
 
-    // add
-    addVideo() {
-      this.video.courseId=this.courseId
-      console.log(this.video)
-      video.addVideo(this.video).then((response) => {
-        this.dialogVideoFormVisible = false;
-        this.$message({
-          type: "success",
-          message: "添加成功",
-        });
-        this.getChapterVideo();
-      });
+    // new section
+    newChapter() {
+      console.log("new Chapter")
+      this.chapter = {}
+      this.initNewEditData()
+      this.editData.label = 'Chapter'
+      this.chapter.courseId = this.courseId
+      this.editData.level = 1
+      console.log(this.editData)
     },
-    updateVideo() {
 
-      console.log("updateVideo" +this.video)
-      video.updateVideo(this.video).then((response) => {
-        this.dialogVideoFormVisible = false;
+    newSection(node) {
+      console.log("add Section")
+      console.log(node)
+      this.initNewEditData()
+      this.section = {}
+      this.editData.label = 'Section'
+      this.section.courseId = this.courseId
+      this.section.chapterId = node.data.id
+      this.editData.level = 2
+      console.log(this.editData)
+      console.log(this.section)
+    },
+
+    setSection() {
+      this.section.title = this.editData.title
+      this.section.sort = this.editData.sort
+      this.section.videoLink = this.editData.videoLink
+    },
+
+    setChapter() {
+      this.chapter.title = this.editData.title
+      this.chapter.sort = this.editData.sort
+    },
+    updateSection() {
+      this.setSection()
+      console.log("updateSection" + this.section)
+      sectionApi.updateSection(this.section).then((response) => {
         this.$message({
           type: 'success',
-          message: '修改成功'
+          message: 'Section updated'
         });
-        this.getChapterVideo()
+        this.getChapterSection()
       });
     },
-    dialogEditVideo(id) {
-      video.getVideo(id)
-      .then(response => {
-          this.video=response.data.item
-          this.dialogVideoFormVisible = true;
-        })
+    // get the content for the section by id
+    getSectionContent(id) {
+      // debugger
+      return Promise.resolve(
+        contentApi.getSectionContent(id)
+          .then(response => {
+            if (response.data.item) {
+              this.editData.content = response.data.item.content
+              this.content = response.data.item
+              console.log("content")
+              console.log(this.content)
+            } else {
+              this.editData.content = "<h3>No Content available, edit right now</h3>"
+            }
+          }))
 
     },
-    dialogAddVideo(id) {
-          this.video={}
-          this.video.chapterId = id;
-          this.dialogVideoFormVisible = true;
+    // get the content for the chapter by id
+    getChapterContent(id) {
+      return Promise.resolve(
+        contentApi.getChapterContent(id)
+          .then(response => {
+            if (response.data.item) {
+              this.editData.content = response.data.item.content
+              this.content = response.data.item
+              console.log("content")
+              console.log(this.content)
+            } else {
+              this.editData.content = "<h3>No Content available, edit right now</h3>"
+            }
+          })
+      )
     },
-    dialogEditChapter(id) {
-      chapter.getChapter(id).then((response) => {
-        this.chapter = response.data.item;
-        this.dialogChapterFormVisible = true;
+    // get chapter section for tree display
+    getChapterSection() {
+      chapterApi.getChapterSection(this.courseId).then((response) => {
+        this.chapterSectionList = response.data.list;
+        console.log(this.chapterSectionList)
       });
     },
-    dialogChapterButton() {
-      this.dialogChapterFormVisible = true;
-      this.chapter = {};
-    },
-    getChapterVideo() {
-      chapter.getChapterVideo(this.courseId).then((response) => {
-        this.chapterVideoList = response.data.list;
-      });
-    },
+
+    // previous button
     previous() {
       this.$router.push({ path: `/course/info/${this.courseId}` });
     },
+    // remove chapter
     removeChapter(id) {
       this.$confirm("此操作删除章节记录，是否继续？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        chapter.deleteChapter(id).then((response) => {
+        chapterApi.deleteChapter(id).then((response) => {
           this.$message({
             type: "success",
             message: "删除成功",
           });
-          this.getChapterVideo();
+          this.getChapterSection();
         });
       });
     },
     saveChapter() {
-      this.chapter.courseId = this.courseId;
-      chapter.addChapter(this.chapter).then((response) => {
-        this.dialogChapterFormVisible = false;
-        this.$message({
-          type: "success",
-          message: "添加成功",
-        });
-        this.getChapterVideo();
-      });
+      this.setChapter()
+      return Promise.resolve(
+        chapterApi.addChapter(this.chapter)
+          .then(response => {
+            this.$message({
+              type: "success",
+              message: 'Chapter added'
+            });
+            console.log(response);
+            this.editData.id = response.data.id
+            this.chapter.id = response.data.id
+            console.log(this.chapter);
+            this.getChapterSection();
+
+          })
+      )
+    },
+    saveSection() {
+      this.setSection()
+      return new Promise((resolve, reject) =>{
+        sectionApi.addSection(this.section)
+        .then(response => {
+          this.$message({
+            type: "success",
+            message: 'Section added'
+          });
+          this.editData.id = response.data.id;
+          this.section.id = response.data.id
+          this.getChapterSection();
+          resolve(response.data.id)
+        })})
     },
     updateChapter() {
-      chapter.updateChapter(this.chapter).then((response) => {
-        this.dialogChapterFormVisible = false;
+      this.setChapter()
+      chapterApi.updateChapter(this.chapter).then((response) => {
         this.$message({
           type: "success",
-          message: "修改成功",
+          message: "Chapter updated",
         });
-        this.getChapterVideo();
+        this.getChapterSection();
       });
     },
-    saveOrUpdate() {
-      if (this.chapter.id) {
-        this.updateChapter();
+
+    saveOrUpdateContent() {
+      // debugger
+      this.content.content = this.editData.content
+      console.log(this.editData)
+      this.content.chapterSectionId = this.editData.id
+      if (this.editData.level === 1) { this.content.chapterSection = 0 }
+      if (this.editData.level === 2) { this.content.chapterSection = 1 }
+
+      console.log("content")
+      console.log(this.content)
+      if (this.content.id) {
+        // debugger
+        contentApi.updateContent(this.content)
+          .then(response => {
+            this.$message({
+              type: "success",
+              message: "Content updated",
+            });
+          })
       } else {
-        this.saveChapter();
+        debugger
+        contentApi.saveContent(this.content)
+          .then(response => {
+            this.$message({
+              type: "success",
+              message: "Content add",
+            });
+          })
       }
+
+    },
+    async saveOrUpdate() {
+      debugger
+      console.log("editData while saveorupdate")
+      console.log(this.editData)
+      if (this.editData.level === 1) {
+        debugger
+        if (this.chapter.id) {
+           this.updateChapter();
+        } else {
+          await this.saveChapter();
+        }
+      } else if (this.editData.level === 2) {
+        debugger
+        if (this.section.id) {
+          this.updateSection();
+        } else {
+          await this.saveSection();
+
+        }
+      }
+      // debugger
+      this.saveOrUpdateContent();
+      this.getChapterSection()
     },
     next() {
       this.$router.push({ path: `/course/publish/${this.courseId}` });
@@ -299,11 +453,11 @@ export default {
 
 .chapterList p {
   float: left;
-  font-size: 20px;
-  margin: 10px 0;
-  padding: 10px;
+  font-size: 14px;
+  margin: 5px 0;
+  padding: 5px;
   height: 70px;
-  line-height: 50px;
+  /* line-height: 50px; */
   width: 100%;
   border: 1px solid #ddd;
 }
@@ -313,18 +467,32 @@ export default {
   font-size: 14px;
 }
 
-.videoList {
-  padding-left: 50px;
+.sectionList {
+  padding-left: 10px;
 }
 
-.videoList p {
+.sectionList p {
   float: left;
-  font-size: 14px;
-  margin: 10px 0;
-  padding: 10px;
-  height: 50px;
-  line-height: 30px;
+  font-size: 12px;
+  margin: 5px 0;
+  padding: 5px;
+  height: 70px;
+  /* line-height: 30px; */
   width: 100%;
   border: 1px dotted #ddd;
+}
+
+.sectionList .sectionActs {
+  float: right;
+  font-size: 12px;
+}
+
+.mavonEditor {
+  width: 100%;
+  height: 100%;
+}
+
+.el-input-sort {
+  width: 100px
 }
 </style>

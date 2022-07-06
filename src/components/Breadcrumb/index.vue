@@ -39,11 +39,11 @@ export default {
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
     },
     isDashboard(route) {
-      const name = route && route.name
+      const name = route && route.path
       if (!name) {
         return false
       }
-      return name.trim().toLocaleLowerCase() === 'Dashboard'.toLocaleLowerCase()
+      return name.trim().toLocaleLowerCase() === '/dashboard'
     },
     pathCompile(path) {
       // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561

@@ -1,9 +1,9 @@
 import request from "@/utils/request";
 
 export default {
-  getChapterVideo(id) {
+  getChapterSection(id) {
     return request({
-      url: `/eduservice/edu-chapter/getChapterVideo/${id}`,
+      url: `/eduservice/edu-chapter/getChapterSection/${id}`,
       method: "get",
     })
   },

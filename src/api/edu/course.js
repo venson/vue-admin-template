@@ -8,9 +8,9 @@ export default {
       data: courseInfo
     })
   },
-  getTeacherList(){
+  getMemberList(){
     return request({
-      url: `/eduservice/edu-teacher/findAll`,
+      url: `/eduservice/edu-member/findAll`,
       method: "get"
     })
   },

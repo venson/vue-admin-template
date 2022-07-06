@@ -3,7 +3,6 @@ import request from '@/utils/request'
 export default {
   addVideo(video) {
     return request({
-      // url: '/eduservice/edu-teacher/'+ current ,
       url: `/eduservice/edu-video/addVideo`,
       method: "post",
       data: video,
@@ -12,7 +11,6 @@ export default {
 
   deleteVideo(id) {
     return request({
-      // url: '/eduservice/edu-teacher/'+ current ,
       url: `/eduservice/edu-video/${id}`,
       method: "delete",
     });
@@ -20,7 +18,6 @@ export default {
 
   updateVideo(video) {
     return request({
-      // url: '/eduservice/edu-teacher/'+ current ,
       url: `/eduservice/edu-video/${video.id}`,
       method: "put",
       data: video
@@ -29,7 +26,6 @@ export default {
 
   getVideo(id) {
     return request({
-      // url: '/eduservice/edu-teacher/'+ current ,
       url: `/eduservice/edu-video/${id}`,
       method: "get",
     });
