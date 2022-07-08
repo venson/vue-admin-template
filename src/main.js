@@ -31,6 +31,8 @@ import '@kangc/v-md-editor/lib/theme/style/github.css';
 import hljs from 'highlight.js';
 
 import * as echarts from 'echarts'
+
+import permission from './store/modules/permission'
 // import MavonEditor from 'mavon-editor'
 // import 'mavon-editor/dist/css/index.css'
 // import MarkdownItMermaid from '@liradb2000/markdown-it-mermaid'
@@ -66,6 +68,7 @@ VueMarkdownEditor.use(createTodoListPlugin())
 Vue.use(ElementUI, { locale })
 Vue.use(VueMarkdownEditor)
 Vue.use(VMdPreview)
+Vue.use(permission)
 // Vue.use(MavonEditor)
 // const md = MavonEditor.mavonEditor.getMarkdownIt()
 // MavonEditor.mavonEditor.getMarkdownIt().use(MarkdownItMermaid);
