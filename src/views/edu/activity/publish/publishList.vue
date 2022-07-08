@@ -5,72 +5,81 @@
   >
     <el-header>
       <h2 style="text-align: center">
-        Research
+        Activity
       </h2>
     </el-header>
     <el-container height="700px">
       <el-main>
-        <!-- Markdown editor -->
-        <div 
-          v-if="requestList!== null"
+        <el-table
+          :data="requestList.records"
+          stripe
+          style="width: 100%"
         >
-          <div
-            v-for="research in requestList" 
-            :key="research.id"
+          <el-table-column
+            prop="title"
+            label="Title"
+            min-width="280"
+          />
+          <el-table-column
+            label="Date"
+            min-width="70"
+            prop="activityDate"
+          />
+          <el-table-column
+            prop="isPublished"
+            label="Status"
+            min-width="100"
           >
-            <!-- <router-link :to="'/research/researchInfo/' + research.id"> -->
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              :disabled="!research.publishRequest"
-              @click="publishResearch(research.id,research.markdown)"
-            >
-              Publish
-            </el-button>
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-              :disabled="!research.publishRequest"
-              @click="reject(research.id)"
-            >
-              Reject
-            </el-button>
-            <!-- </router-link> -->
-            <v-md-preview
-              :text="research.markdown"
-            />
-          </div>
-        </div>
-        <!-- </el-main> -->
-        <!-- </el-container> -->
+            <template slot-scope="scope">
+              {{ scope.row.isPublished=== true ? "Published" : "Unpublished" }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="Operations"
+            min-width="120"
+            align="center"
+          >
+            <template slot-scope="scope">
+              <router-link 
+                v-permission="['activity.edit']"
+                :to="'/activity/publish/publishInfo/' + scope.row.id"
+              >
+                <el-button
+                  type="primary"
+                  size="mini"
+                  icon="el-icon-edit"
+                >
+                  Preview
+                </el-button>
+              </router-link>
+              <el-button
+                v-permission="['activity.delete']"
+
+                type="danger"
+                size="mini"
+                icon="el-icon-delete"
+                @click="reject(scope.row.id)"
+              >
+                Reject
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
-import researchApi from '@/api/edu/research'
-// import {xss} from '@kangc/v-md-editor'
-// import VueMarkdownEditor, {xss} from '@kangc/v-md-editor'
-// import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/cdn';
-// import createMermaidPlugin from '@kangc/v-md-editor/lib/plugins/mermaid/cdn';
-// import '@kangc/v-md-editor/lib/plugins/mermaid/mermaid.css';
-// import createTodoListPlugin from '@kangc/v-md-editor/lib/plugins/todo-list/index';
-// import '@kangc/v-md-editor/lib/plugins/todo-list/todo-list.css';
-
-// import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-// import '@kangc/v-md-editor/lib/theme/style/github.css';
-// import hljs from 'highlight.js';
-// VueMarkdownEditor.use(githubTheme, {Hljs: hljs,})
-// VueMarkdownEditor.use(createMermaidPlugin())
-// VueMarkdownEditor.use(createKatexPlugin())
-// VueMarkdownEditor.use(createTodoListPlugin())
+import activityApi from '@/api/edu/activity'
+import permission from '@/directive/permission'
 export default {
+    directives: { permission},
     data() {
         return {
             requestList: [],
+            page: 1,
+            limit: 10,
 
         }
     },
@@ -78,32 +87,31 @@ export default {
         this.getRequestList()
     },
     methods: {
-        getRequestList() {
-            researchApi.getPublishList()
+        getRequestList(page=1) {
+            activityApi.getPageRequestList(page, this.limit)
                 .then(response => {
-                    this.requestList = response.data.item
+                    this.requestList = response.data
                     console.log(response)
+                    console.log(this.requestList)
                 })
         },
-        editResearch(id){
-            this.$router.push(`/research/researchInfo/${id}`)
+        editactivity(id){
+            this.$router.push(`/activity/activityInfo/${id}`)
 
         },
-        publishResearch(id){
-            researchApi.publish(id)
+        publishactivity(id){
+            activityApi.publish(id)
             .then(()=>{
                 this.$message({
-                    message: 'Research Published',
+                    message: 'activity Published',
                     type: 'success'
                 })
                     this.getRequestList()
             })
-            // this.html = xss.process(VueMarkdownEditor.themeConfig.markdownParser.render(markdown))
-            // console.log(this.html)
 
         },
         reject(id){
-            researchApi.publishReject(id).then(
+            activityApi.publishReject(id).then(
                 ()=> {
                     this.$message({
                         type: 'info',

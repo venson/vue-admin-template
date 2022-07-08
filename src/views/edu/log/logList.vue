@@ -82,7 +82,7 @@
             type="danger"
             size="mini"
             icon="el-icon-delete"
-            @click="deleteActivity(scope.row.id)"
+            @click="deleteCourse(scope.row.id)"
           >
             删除
           </el-button>
@@ -109,6 +109,12 @@
 import activityApi from '@/api/edu/activity'
 import permission from '@/directive/permission/index'
 export default {
+    // computed: {
+    //   ...mapGetters([
+    //     'buttons'
+    //   ]
+    //   )
+    // },
     directives: { permission },
     data(){
         return {
@@ -150,17 +156,6 @@ export default {
     }
 
 
-    },
-    deleteActivity(id){
-      activityApi.deleteActivity(id)
-      .then(()=>{
-        this.$message({
-          type:'success',
-          message: 'Delete successed'
-        })
-        this.getPageActivity(this.page)
-      })
     }
-
 }   
 </script>
