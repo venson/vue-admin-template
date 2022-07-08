@@ -36,6 +36,12 @@ export default {
         })
     },
 
+    getPageRequestList(page,limit){
+        return request({
+            url: `${activityUrl}/publish/${page}/${limit}`,
+            method: 'get',
+        })
+    },
     requestPublish(id){
         return request({
             url: `${activityUrl}/publish/${id}`,
@@ -48,7 +54,7 @@ export default {
             method: 'put',
         })
     },
-    rejectActivity(id){
+    reject(id){
         return request({
             url: `${activityUrl}/publish/${id}`,
             method: 'delete',
