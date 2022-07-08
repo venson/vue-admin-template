@@ -9,7 +9,6 @@
     </el-header>
     <el-container>
       <el-main>
-        <!-- Markdown editor -->
         <div 
           v-if="requestList!== null"
         >
@@ -36,7 +35,7 @@
             >
               Reject
             </el-button>
-            <!-- </router-link> -->
+            <!-- Markdown preview-->
             <v-md-preview
               :text="methodology.markdown"
             />

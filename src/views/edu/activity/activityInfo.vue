@@ -23,7 +23,7 @@
             type="primary"
             size="mini"
             icon="el-icon-folder-checked"
-            @click="saveEdit"
+            @click="saveActivity"
           >
             save
           </el-button>
@@ -31,7 +31,7 @@
             type="primary"
             size="mini"
             icon="el-icon-collection"
-            @click="publishApply"
+            @click="requestPublish"
           >
             Request
           </el-button>
@@ -55,6 +55,8 @@
 <script>
 import activityApi from '@/api/edu/activity'
 import ossApi from '@/api/oss'
+import {mapGetters} from 'vuex'
+import permission from '@/directive/permission/index'
 
 export default {
   data() {
@@ -65,10 +67,12 @@ export default {
 
     }
   },
+  directives: { permission },
   computed: {
     ...mapGetters([
       'name',
-      'id'
+      'id',
+      'buttons'
     ])
   },
   created() {
@@ -118,17 +122,7 @@ export default {
       return this.activity === this.activityBack
     },
 
-        addActivity(){
-            activityApi.getActivity(this.addActivity)
-            .then(() =>{
-                this.$message({
-                    type: 'success',
-                    message: 'Add Activity successed'
-                })
-            })
-        },
-
-        updateActivity(){
+        saveActivity(){
             if(this.modifiedCheck()){
                 this.$message({
                     type: 'info',
@@ -136,7 +130,19 @@ export default {
                 })
                 return 
             }
-            activityApi.getActivity(this.activity.id, this.activity)
+            if(this.activity.id ==null){
+            activityApi.addActivity(this.activity)
+            .then((response) =>{
+                this.$message({
+                    type: 'success',
+                    message: 'Add Activity successed'
+                })
+                this.activity.id = response.data.item
+
+                this.activityBack = this.activity
+            })
+            }else{
+            activityApi.updateActivity(this.activity.id, this.activity)
             .then(() =>{
                 this.$message({
                     type: 'success',
@@ -144,6 +150,7 @@ export default {
                 })
                 this.activityBack = this.activity
             })
+            }
         },
 
         requestPublish(){
