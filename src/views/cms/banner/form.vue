@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-form label-width="120px">
       <el-form-item label="标题">
-        <el-input v-model="banner.title"/>
+        <el-input v-model="banner.title" />
       </el-form-item>
 
       <el-form-item label="Banner">
@@ -21,19 +21,31 @@
           :action="BASE_API + 'eduoss/fileoss'"
           class="avatar-uploader"
         >
-          <img v-if="banner.imageUrl" :src="banner.imageUrl" class="avatar" 
-          width="900px"/>
+          <img
+            v-if="banner.imageUrl"
+            :src="banner.imageUrl"
+            class="avatar" 
+            width="900px"
+          >
         </el-upload>
         <el-upload
-  class="avatar-uploader"
-  action="BASE_API + '/eduoss/fileoss'"
-  :auto-upload="false"
-  :show-file-list="false"
-  :on-success="handleAvatarSuccess"
-  :before-upload="beforeAvatarUpload">
-  <img v-if="imageUrl" :src="imageUrl" class="avatar">
-  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-</el-upload>
+          class="avatar-uploader"
+          action="BASE_API + '/eduoss/fileoss'"
+          :auto-upload="false"
+          :show-file-list="false"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload"
+        >
+          <img
+            v-if="imageUrl"
+            :src="imageUrl"
+            class="avatar"
+          >
+          <i
+            v-else
+            class="el-icon-plus avatar-uploader-icon"
+          />
+        </el-upload>
       </el-form-item>
 
       <!-- <el-form-item label="链接">
@@ -41,16 +53,30 @@
       </el-form-item> -->
 
       <el-form-item label="排序">
-        <el-input-number v-model="banner.sort" :min="0" controls-position="right"/>
+        <el-input-number
+          v-model="banner.sort"
+          :min="0"
+          controls-position="right"
+        />
       </el-form-item>
 
       <el-form-item>
-        <el-button :disabled="saveBtnDisabled" type="primary" @click="saveOrUpdate">保存</el-button>
+        <el-button
+          :disabled="saveBtnDisabled"
+          type="primary"
+          @click="saveOrUpdate"
+        >
+          保存
+        </el-button>
       </el-form-item>
     </el-form>
-<el-dialog :visible.sync="dialogVisible">
-  <img width="100%" :src="dialogImageUrl" alt="">
-</el-dialog>
+    <el-dialog :visible.sync="dialogVisible">
+      <img
+        width="100%"
+        :src="dialogImageUrl"
+        alt=""
+      >
+    </el-dialog>
   </div>
 </template>
 

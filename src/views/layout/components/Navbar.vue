@@ -1,20 +1,42 @@
 <template>
-  <el-menu class="navbar" mode="horizontal">
-    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
+  <el-menu
+    class="navbar"
+    mode="horizontal"
+  >
+    <hamburger
+      :toggle-click="toggleSideBar"
+      :is-active="sidebar.opened"
+      class="hamburger-container"
+    />
     <breadcrumb />
-    <el-dropdown class="avatar-container" trigger="click">
+    <el-dropdown
+      class="avatar-container"
+      trigger="click"
+    >
       <div class="avatar-wrapper">
-        <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-        <i class="el-icon-caret-bottom"/>
+        <img
+          :src="avatar+'?imageView2/1/w/80/h/80'"
+          class="user-avatar"
+        >
+        <i class="el-icon-caret-bottom" />
       </div>
-      <el-dropdown-menu slot="dropdown" class="user-dropdown">
-        <router-link class="inlineBlock" to="/">
+      <el-dropdown-menu
+        slot="dropdown"
+        class="user-dropdown"
+      >
+        <router-link
+          class="inlineBlock"
+          to="/"
+        >
           <el-dropdown-item>
             主页
           </el-dropdown-item>
         </router-link>
         <el-dropdown-item divided>
-          <span style="display:block;" @click="logout">登出</span>
+          <span
+            style="display:block;"
+            @click="logout"
+          >登出</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>

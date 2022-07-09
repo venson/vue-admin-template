@@ -7,7 +7,7 @@
 <script>
 // import Editor from "@tinymce/tinymce-vue";
 export default {
-  name: "app",
+  name: "App",
   // component: {
   //   // editor: Editor,
   // },

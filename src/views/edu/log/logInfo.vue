@@ -5,19 +5,18 @@
     <el-container height="700px">
       <el-main>
         <!-- Markdown editor -->
-      <el-form>
-        <el-form-item label="Title">
-          <el-input v-model="activity.title"></el-input>
-        </el-form-item>
-        <el-form-item label="Date">
-          <el-date-picker
-          v-model="activity.activityDate"
-          type="date"
-          placeholder="Pick Activity Date"
-          >
-          </el-date-picker>
-        </el-form-item>
-      </el-form>
+        <el-form>
+          <el-form-item label="Title">
+            <el-input v-model="activity.title" />
+          </el-form-item>
+          <el-form-item label="Date">
+            <el-date-picker
+              v-model="activity.activityDate"
+              type="date"
+              placeholder="Pick Activity Date"
+            />
+          </el-form-item>
+        </el-form>
         <div>
           <el-button
             type="primary"

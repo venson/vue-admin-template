@@ -1,92 +1,167 @@
 <template>
   <div class="app-container">
-    <h2 style="text-align: center">New Article</h2>
+    <h2 style="text-align: center">
+      New Article
+    </h2>
 
     <el-form label-width="150px">
       <el-form-item label="Title">
-        <el-input type="textarea" :rows="2" v-model="scholar.title" placeholder="Title" />
+        <el-input
+          v-model="scholar.title"
+          type="textarea"
+          :rows="2"
+          placeholder="Title"
+        />
       </el-form-item>
       <el-form-item label="Authors">
-        <el-input v-model="scholar.authors" placeholder="Authors" />
+        <el-input
+          v-model="scholar.authors"
+          placeholder="Authors"
+        />
       </el-form-item>
       <el-form-item label="Lab members">
-        <el-button type="success" icon="el-icon-plus" size="mini" circle @click="dialogMemberVisible = true">
-        </el-button>
+        <el-button
+          type="success"
+          icon="el-icon-plus"
+          size="mini"
+          circle
+          @click="dialogMemberVisible = true"
+        />
         <el-checkbox-group v-model="labMemberList">
-          <el-checkbox-button v-for="(member,index) in labMemberObjList" :label="member.id" :key="index">{{ member.name }}
+          <el-checkbox-button
+            v-for="(member,index) in labMemberObjList"
+            :key="index"
+            :label="member.id"
+          >
+            {{ member.name }}
           </el-checkbox-button>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="Publication Date">
-        <el-date-picker v-model="scholar.publicationDate" format="yyyy-MM" value-format="yyyy-MM" type="month"
-          placeholder="choseDate">
-        </el-date-picker>
+        <el-date-picker
+          v-model="scholar.publicationDate"
+          format="yyyy-MM"
+          value-format="yyyy-MM"
+          type="month"
+          placeholder="choseDate"
+        />
       </el-form-item>
       <el-form-item label="Journal">
-        <el-input v-model="scholar.journal" placeholder="Journal" />
+        <el-input
+          v-model="scholar.journal"
+          placeholder="Journal"
+        />
       </el-form-item>
       <el-form-item label="Volume">
-        <el-input v-model="scholar.volume" placeholder="Volume" />
+        <el-input
+          v-model="scholar.volume"
+          placeholder="Volume"
+        />
       </el-form-item>
       <el-form-item label="Issue">
-        <el-input v-model="scholar.issue" placeholder="Issue" />
+        <el-input
+          v-model="scholar.issue"
+          placeholder="Issue"
+        />
       </el-form-item>
       <el-form-item label="Pages">
-        <el-input v-model="scholar.pages" placeholder="Pages" />
+        <el-input
+          v-model="scholar.pages"
+          placeholder="Pages"
+        />
       </el-form-item>
       <el-form-item label="Publisher">
-        <el-input v-model="scholar.publisher" placeholder="Publisher" />
+        <el-input
+          v-model="scholar.publisher"
+          placeholder="Publisher"
+        />
       </el-form-item>
       <el-form-item label="Description">
-        <el-input type="textarea" :rows="4" v-model="scholar.description" placeholder="Description" />
+        <el-input
+          v-model="scholar.description"
+          type="textarea"
+          :rows="4"
+          placeholder="Description"
+        />
       </el-form-item>
       <el-form-item label="Citations">
         <el-form :inline="true">
-          <el-form-item v-for="(citation,index) in citationList" :label="citation.year" :key="index" class="citation-year">
-            <el-input v-model="citation.citations"></el-input>
+          <el-form-item
+            v-for="(citation,index) in citationList"
+            :key="index"
+            :label="citation.year"
+            class="citation-year"
+          >
+            <el-input v-model="citation.citations" />
           </el-form-item>
 
-          <div ref="chart" style="width:400px;height:200px"></div>
-
+          <div
+            ref="chart"
+            style="width:400px;height:200px"
+          />
         </el-form>
       </el-form-item>
       <el-form-item label="Total citations">
-        <el-input v-model="scholar.totalCitations" placeholder="Total citations" />
+        <el-input
+          v-model="scholar.totalCitations"
+          placeholder="Total citations"
+        />
       </el-form-item>
       <el-form-item label="LinkText">
-        <el-input v-model="scholar.linkText" placeholder="LinkText" />
+        <el-input
+          v-model="scholar.linkText"
+          placeholder="LinkText"
+        />
       </el-form-item>
       <el-form-item label="LinkUrl">
-        <el-input v-model="scholar.linkUrl" placeholder="LinkUrl" />
+        <el-input
+          v-model="scholar.linkUrl"
+          placeholder="LinkUrl"
+        />
       </el-form-item>
       <!-- 所属分类 TODO -->
       <!-- 课程讲师 TODO -->
 
       <el-form-item>
-        <el-button :disabled="saveBtnDisabled" type="primary" @click="save()">保存并下一步</el-button>
+        <el-button
+          :disabled="saveBtnDisabled"
+          type="primary"
+          @click="save()"
+        >
+          保存并下一步
+        </el-button>
       </el-form-item>
     </el-form>
-    <el-dialog title="lab members" :visible.sync="dialogMemberVisible">
-
+    <el-dialog
+      title="lab members"
+      :visible.sync="dialogMemberVisible"
+    >
       <el-form>
-
         <el-form-item label="Lab Member">
-
           <el-checkbox-group v-model="labMemberList">
-            <el-checkbox-button v-for="(member,index) in memberList" :label="member.id" :key="index">{{ member.name }}
+            <el-checkbox-button
+              v-for="(member,index) in memberList"
+              :key="index"
+              :label="member.id"
+            >
+              {{ member.name }}
             </el-checkbox-button>
           </el-checkbox-group>
         </el-form-item>
 
 
         <el-form-item>
-          <el-button type="success" @click="scholarMemberSelect()" style="float:right">Confirm</el-button>
+          <el-button
+            type="success"
+            style="float:right"
+            @click="scholarMemberSelect()"
+          >
+            Confirm
+          </el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
   </div>
-
-
 </template>
 
 <script>
@@ -160,16 +235,6 @@ export default {
       BASE_API: process.env.VUE_APP_BASE_API,
     };
   },
-  created() {
-    // console.log("start")
-    if (this.$route.params && this.$route.params.id) {
-      this.scholarId = this.$route.params.id
-      this.scholar.id = this.scholarId
-      this.getScholar()
-      console.log(this.scholarId)
-    }
-    this.getmemberList()
-  },
   watch: {
     'scholar.publicationDate': {
       handler(newDate, oldYear) {
@@ -201,6 +266,16 @@ export default {
         this.refreshEchartData()
       }
     },
+  },
+  created() {
+    // console.log("start")
+    if (this.$route.params && this.$route.params.id) {
+      this.scholarId = this.$route.params.id
+      this.scholar.id = this.scholarId
+      this.getScholar()
+      console.log(this.scholarId)
+    }
+    this.getmemberList()
   },
   mounted(){
     this.echartsInit()

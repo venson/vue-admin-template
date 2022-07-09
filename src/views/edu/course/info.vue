@@ -1,6 +1,8 @@
 <template>
   <div class="app-container">
-    <h2 style="text-align: center">发布新课程</h2>
+    <h2 style="text-align: center">
+      发布新课程
+    </h2>
     <el-steps
       :active="1"
       process-status="wait"
@@ -34,7 +36,10 @@
             :value="subject.id"
           />
         </el-select>
-        <el-select v-model="courseInfo.subjectId" placeholder="请选择">
+        <el-select
+          v-model="courseInfo.subjectId"
+          placeholder="请选择"
+        >
           <el-option
             v-for="subject in levelISubjectList"
             :key="subject.id"
@@ -45,7 +50,10 @@
       </el-form-item>
       <!-- 课程讲师 TODO -->
       <el-form-item label="课程教师">
-        <el-select v-model="courseInfo.memberId" placeholder="请选择">
+        <el-select
+          v-model="courseInfo.memberId"
+          placeholder="请选择"
+        >
           <el-option
             v-for="member in memberList"
             :key="member.id"
@@ -64,9 +72,15 @@
       </el-form-item>
       <!-- 课程简介 TODO -->
       <el-form-item label="课程简介">
-        <el-input v-model="courseInfo.description" placeholder=" 示例：" />
+        <el-input
+          v-model="courseInfo.description"
+          placeholder=" 示例："
+        />
         <div id="editor">
-          <v-md-editor v-model="courseInfo.description" height="500px" />
+          <v-md-editor
+            v-model="courseInfo.description"
+            height="500px"
+          />
           <!-- <mavon-editor v-model="courseInfo.description" /> -->
         </div>
       </el-form-item>
@@ -79,8 +93,15 @@
           :action="BASE_API + '/eduoss/fileoss'"
           class="avatar-uploader"
         >
-          <img v-if="courseInfo.cover" :src="courseInfo.cover" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon" />
+          <img
+            v-if="courseInfo.cover"
+            :src="courseInfo.cover"
+            class="avatar"
+          >
+          <i
+            v-else
+            class="el-icon-plus avatar-uploader-icon"
+          />
         </el-upload>
       </el-form-item>
 
@@ -94,7 +115,13 @@
         元
       </el-form-item> -->
       <el-form-item>
-        <el-button :disabled="saveBtnDisabled" type="primary" @click="next">保存并下一步</el-button>
+        <el-button
+          :disabled="saveBtnDisabled"
+          type="primary"
+          @click="next"
+        >
+          保存并下一步
+        </el-button>
       </el-form-item>
     </el-form>
   </div>

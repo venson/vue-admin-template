@@ -55,7 +55,7 @@
         <template slot-scope="scope">
           {{ (scope.row.isPublished === true ? "已发布" : "未发布") +
             (scope.row.publishRequest === 1 ? "/Requested" : "")
-              + (scope.row.publishRequest === 2 ? "/rejected" : "")
+            + (scope.row.publishRequest === 2 ? "/rejected" : "")
           }}
         </template>
       </el-table-column>
@@ -152,6 +152,11 @@ export default {
     },
 
     deleteActivity(id) {
+        this.$confirm('Confirm Delete?', 'Warning', {
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(()=>{
       activityApi.deleteActivity(id)
         .then(() => {
           this.$message({
@@ -160,6 +165,7 @@ export default {
           })
           this.getPageActivity(this.page)
         })
+      })
     }
 
   },

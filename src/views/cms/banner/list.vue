@@ -1,32 +1,64 @@
 <template>
   <div class="app-container">
-
     <!-- 工具条 -->
     <div>
-      <el-button type="danger" size="mini" @click="addBanner()">Add</el-button>
-      <el-button type="danger" size="mini" @click="removeBannerBatch()">Remove Batch</el-button>
-
+      <el-button
+        type="danger"
+        size="mini"
+        @click="addBanner()"
+      >
+        Add
+      </el-button>
+      <el-button
+        type="danger"
+        size="mini"
+        @click="removeBannerBatch()"
+      >
+        Remove Batch
+      </el-button>
     </div>
 
     <!-- banner列表 -->
-    <el-table v-loading="listLoading" :data="list" stripe style="width: 100%" @selection-change="handleSelectionChange">
+    <el-table
+      v-loading="listLoading"
+      :data="list"
+      stripe
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column
+        type="selection"
+        width="10"
+      />
 
-      <el-table-column type="selection" width="10" />
-
-      <el-table-column label="序号" width="70" align="center">
+      <el-table-column
+        label="序号"
+        width="70"
+        align="center"
+      >
         <template slot-scope="scope">
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
 
-      <el-table-column label="banner" min-width="600" align="center">
+      <el-table-column
+        label="banner"
+        min-width="600"
+        align="center"
+      >
         <template slot-scope="scope">
           <div class="info">
             <div class="pic">
-              <img :src="scope.row.imageUrl" alt="scope.row.title" width="600px">
+              <img
+                :src="scope.row.imageUrl"
+                alt="scope.row.title"
+                width="600px"
+              >
             </div>
             <div class="title">
-              <p href="">{{ scope.row.title }}</p>
+              <p href="">
+                {{ scope.row.title }}
+              </p>
             </div>
           </div>
         </template>
@@ -34,22 +66,46 @@
 
       <!-- <el-table-column prop="linkUrl" label="链接" /> -->
 
-      <el-table-column prop="sort" label="Sort" min-width="50" />
+      <el-table-column
+        prop="sort"
+        label="Sort"
+        min-width="50"
+      />
 
-      <el-table-column label="Operation" min-width="150" align="center">
+      <el-table-column
+        label="Operation"
+        min-width="150"
+        align="center"
+      >
         <template slot-scope="scope">
           <router-link :to="'/cms/banner/update/' + scope.row.id">
-            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+            <el-button
+              type="primary"
+              size="mini"
+              icon="el-icon-edit"
+            />
           </router-link>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeBanner(scope.row.id)"></el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            icon="el-icon-delete"
+            @click="removeBanner(scope.row.id)"
+          />
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 分页组件 -->
-    <el-pagination :current-page="page" :total="total" :page-size="limit" :page-sizes="[5, 10]"
-      style="padding: 30px 0; text-align: center;" layout="sizes, prev, pager, next, jumper, ->, total, slot"
-      @current-change="getBannerList" @size-change="changeSize" />
+    <el-pagination
+      :current-page="page"
+      :total="total"
+      :page-size="limit"
+      :page-sizes="[5, 10]"
+      style="padding: 30px 0; text-align: center;"
+      layout="sizes, prev, pager, next, jumper, ->, total, slot"
+      @current-change="getBannerList"
+      @size-change="changeSize"
+    />
   </div>
 </template>
 

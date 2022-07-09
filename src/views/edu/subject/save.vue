@@ -2,7 +2,9 @@
   <div class="app-container">
     <el-form label-width="120px">
       <el-form-item label="信息描述">
-        <el-tag type="info">excel模板说明</el-tag>
+        <el-tag type="info">
+          excel模板说明
+        </el-tag>
 
         <el-tag>
           <i class="el-icon-download" />
@@ -12,7 +14,7 @@
       <el-form-item label="文件上传">
         <el-upload
           ref="upload"
-          :action= "BASE_API+'eduservice/edu-subject/addSubject'"
+          :action="BASE_API+'eduservice/edu-subject/addSubject'"
           name="file"
           accept=".xls, .xlsx"
           :on-success="fileUploadSuccess"
@@ -21,17 +23,22 @@
           :limit="1"
           :auto-upload="false"
         >
-          <el-button slot="trigger" size="small" type="primary"
-            >选择文件</el-button
+          <el-button
+            slot="trigger"
+            size="small"
+            type="primary"
           >
+            选择文件
+          </el-button>
           <el-button
             style="margin-left: 10px"
             size="small"
             type="success"
-            @click="submitUpload"
             :loading="loading"
-            >上传到服务器</el-button
+            @click="submitUpload"
           >
+            上传到服务器
+          </el-button>
         </el-upload>
       </el-form-item>
     </el-form>

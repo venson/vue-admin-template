@@ -2,20 +2,50 @@
   <div class="app-container">
     <!-- 查询表单 -->
     <!--查询表单-->
-    <el-form :inline="true" class="demo-form-inline">
+    <el-form
+      :inline="true"
+      class="demo-form-inline"
+    >
       <el-form-item>
-        <el-input v-model="searchObj.roleName" placeholder="角色名称"/>
+        <el-input
+          v-model="searchObj.roleName"
+          placeholder="角色名称"
+        />
       </el-form-item>
 
-      <el-button type="primary" icon="el-icon-search" @click="fetchData()">查询</el-button>
-      <el-button type="default" @click="resetData()">清空</el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-search"
+        @click="fetchData()"
+      >
+        查询
+      </el-button>
+      <el-button
+        type="default"
+        @click="resetData()"
+      >
+        清空
+      </el-button>
     </el-form>
 
     <!-- 工具条 -->
     <div>
-      <el-button type="danger" size="mini" @click="addUser()" v-if="hasPerm('role.add')">添加</el-button>
-      <el-button type="danger" size="mini" @click="removeRows()" v-if="hasPerm('role.remove')">批量删除</el-button>
-
+      <el-button
+        v-if="hasPerm('role.add')"
+        type="danger"
+        size="mini"
+        @click="addUser()"
+      >
+        添加
+      </el-button>
+      <el-button
+        v-if="hasPerm('role.remove')"
+        type="danger"
+        size="mini"
+        @click="removeRows()"
+      >
+        批量删除
+      </el-button>
     </div>
 
     <!-- 讲师列表 -->
@@ -24,33 +54,58 @@
       :data="list"
       stripe
       style="width: 100%"
-      @selection-change="handleSelectionChange">
-
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column
         type="selection"
-        width="55" />
+        width="55"
+      />
 
       <el-table-column
         label="序号"
         width="70"
-        align="center">
+        align="center"
+      >
         <template slot-scope="scope">
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
 
-      <el-table-column prop="roleName" label="角色名称" />
+      <el-table-column
+        prop="roleName"
+        label="角色名称"
+      />
 
 
-      <el-table-column label="操作" width="200" align="center">
+      <el-table-column
+        label="操作"
+        width="200"
+        align="center"
+      >
         <template slot-scope="scope">
           <router-link :to="'/acl/role/distribution/'+scope.row.id">
-            <el-button type="info" size="mini" icon="el-icon-info" v-if="hasPerm('role.acl')"></el-button>
+            <el-button
+              v-if="hasPerm('role.acl')"
+              type="info"
+              size="mini"
+              icon="el-icon-info"
+            />
           </router-link>
           <router-link :to="'/acl/role/update/'+scope.row.id">
-            <el-button type="primary" size="mini" icon="el-icon-edit"  v-if="hasPerm('role.update')"></el-button>
+            <el-button
+              v-if="hasPerm('role.update')"
+              type="primary"
+              size="mini"
+              icon="el-icon-edit"
+            />
           </router-link>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeDataById(scope.row.id)" v-if="hasPerm('role.remove')"></el-button>
+          <el-button
+            v-if="hasPerm('role.remove')"
+            type="danger"
+            size="mini"
+            icon="el-icon-delete"
+            @click="removeDataById(scope.row.id)"
+          />
         </template>
       </el-table-column>
     </el-table>

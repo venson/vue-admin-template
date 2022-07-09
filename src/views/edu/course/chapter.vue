@@ -2,30 +2,65 @@
   <div>
     <el-container class="app-container">
       <el-header height="140px">
-        <h2 style="text-align: center">New Course</h2>
-        <el-steps :active="2" process-status="wait" align-center style="margin: bottom 4px" finish-status="success">
-          <el-step title="Course Base Info"></el-step>
-          <el-step title="Edit Course"></el-step>
-          <el-step title="Publish"></el-step>
+        <h2 style="text-align: center">
+          New Course
+        </h2>
+        <el-steps
+          :active="2"
+          process-status="wait"
+          align-center
+          style="margin: bottom 4px"
+          finish-status="success"
+        >
+          <el-step title="Course Base Info" />
+          <el-step title="Edit Course" />
+          <el-step title="Publish" />
         </el-steps>
       </el-header>
       <el-container height="700px">
         <el-aside width="260px">
-          <el-button type="text" @click="newChapter">New Chapter</el-button>
-          <el-tree :data="chapterSectionList" node-key="id" default-expand-all :props="props"
-            :expand-on-click-node="false">
+          <el-button
+            type="text"
+            @click="newChapter"
+          >
+            New Chapter
+          </el-button>
+          <el-tree
+            :data="chapterSectionList"
+            node-key="id"
+            default-expand-all
+            :props="props"
+            :expand-on-click-node="false"
+          >
             <!-- <span class="custom-tree-node" slot-scope="{ node, data }"> -->
-            <span class="custom-tree-node" style="width:200px;height:28px" slot-scope="{ node, data }">
+            <span
+              slot-scope="{ node, data }"
+              class="custom-tree-node"
+              style="width:200px;height:28px"
+            >
               <span style="display:inline-block"> {{ node.label }}</span>
               <span style="position:absolute;right:0px">
-                <el-button v-if="node.level === 1" type="text" size="mini" @click="newSection(node)">
+                <el-button
+                  v-if="node.level === 1"
+                  type="text"
+                  size="mini"
+                  @click="newSection(node)"
+                >
                   New
                 </el-button>
-                <el-button type="text" size="mini" @click="editChapterSection(node, data)">
-                  <i class="el-icon-edit"></i>
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="editChapterSection(node, data)"
+                >
+                  <i class="el-icon-edit" />
                 </el-button>
-                <el-button type="text" size="mini" @click="() => remove(node, data)">
-                  <i class="el-icon-delete"></i>
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="() => remove(node, data)"
+                >
+                  <i class="el-icon-delete" />
                 </el-button>
 
               </span>
@@ -35,24 +70,57 @@
         <el-main>
           <!-- chapter section form -->
           <el-form :model="editData">
-            <el-form-item :label="editData.label" label-width="60px">
+            <el-form-item
+              :label="editData.label"
+              label-width="60px"
+            >
               <el-input v-model="editData.title" />
             </el-form-item>
 
-            <el-form-item v-if="editData.level === 2" label="Bilibili" label-width="60px">
+            <el-form-item
+              v-if="editData.level === 2"
+              label="Bilibili"
+              label-width="60px"
+            >
               <el-input v-model="editData.videoLink" />
             </el-form-item>
-            <el-form-item label="Sort" label-width="60px">
-              <el-input class="el-input-sort" v-model="editData.sort" />
-              <el-button type="success" style="margin-left:20px" @click="saveOrUpdate()">Save</el-button>
+            <el-form-item
+              label="Sort"
+              label-width="60px"
+            >
+              <el-input
+                v-model="editData.sort"
+                class="el-input-sort"
+              />
+              <el-button
+                type="success"
+                style="margin-left:20px"
+                @click="saveOrUpdate()"
+              >
+                Save
+              </el-button>
             </el-form-item>
           </el-form>
           <!-- Markdown editor -->
-          <v-md-editor v-model="editData.content" :left-toolbar="lefttoolbar" :disabled-menus="[]" highlight-current
-            @upload-image="handleUploadImage" height="800px"></v-md-editor>
+          <v-md-editor
+            v-model="editData.content"
+            :left-toolbar="lefttoolbar"
+            :disabled-menus="[]"
+            highlight-current
+            height="800px"
+            @upload-image="handleUploadImage"
+          />
           <div>
-            <el-button @click="previous">上一步</el-button>
-            <el-button :disabled="saveBtnDisabled" type="primary" @click="next">下一步</el-button>
+            <el-button @click="previous">
+              上一步
+            </el-button>
+            <el-button
+              :disabled="saveBtnDisabled"
+              type="primary"
+              @click="next"
+            >
+              下一步
+            </el-button>
           </div>
         </el-main>
       </el-container>

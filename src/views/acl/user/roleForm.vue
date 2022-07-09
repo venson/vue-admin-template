@@ -1,13 +1,33 @@
 <template>
   <div class="app-container">
-    <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
-    <div style="margin: 15px 0;"></div>
-    <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-        <el-checkbox v-for="city in cities" :label="city.id" :key="city.id">{{city.roleName}}</el-checkbox>
+    <el-checkbox
+      v-model="checkAll"
+      :indeterminate="isIndeterminate"
+      @change="handleCheckAllChange"
+    >
+      全选
+    </el-checkbox>
+    <div style="margin: 15px 0;" />
+    <el-checkbox-group
+      v-model="checkedCities"
+      @change="handleCheckedCitiesChange"
+    >
+      <el-checkbox
+        v-for="city in cities"
+        :key="city.id"
+        :label="city.id"
+      >
+        {{ city.roleName }}
+      </el-checkbox>
     </el-checkbox-group>
     </br>
-    <el-button :disabled="saveBtnDisabled" type="primary" @click="update">保存</el-button>
-    
+    <el-button
+      :disabled="saveBtnDisabled"
+      type="primary"
+      @click="update"
+    >
+      保存
+    </el-button>
   </div>
 </template>
 

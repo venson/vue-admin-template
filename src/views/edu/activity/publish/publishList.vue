@@ -40,18 +40,6 @@
             align="center"
           >
             <template slot-scope="scope">
-              <router-link 
-                v-permission="['activity.edit']"
-                :to="'/activity/publish/publishInfo/' + scope.row.id"
-              >
-                <el-button
-                  type="primary"
-                  size="mini"
-                  icon="el-icon-edit"
-                >
-                  Preview
-                </el-button>
-              </router-link>
               <el-button
                 type="primary"
                 size="mini"
@@ -122,15 +110,20 @@ export default {
           this.$router.push(`publish/${id}`)
         },
         reject(id){
-            activityApi.publishReject(id).then(
+            this.$confirm('Confirm Deletation?', 'Warning',{
+              confirmButtonText: 'Delete',
+              cancelButtonText: 'Cancel'
+            }).then(()=>{
+            activityApi.reject(id).then(
                 ()=> {
                     this.$message({
-                        type: 'info',
+                        type: 'success',
                         message: 'Request rejected'
                     })
                     this.getRequestList()
                 }
             )
+            })
         }
     },
 }
