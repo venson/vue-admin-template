@@ -5,7 +5,7 @@
   >
     <el-header>
       <h2 style="text-align: center">
-        Research
+        activity
       </h2>
     </el-header>
     <el-container height="700px">
@@ -16,7 +16,7 @@
             type="primary"
             size="mini"
             icon="el-icon-edit"
-            :disabled="!activity.publishRequest"
+            :disabled="activity.publishRequest!=1"
             @click="publish()"
           >
             Publish
@@ -25,7 +25,7 @@
             type="primary"
             size="mini"
             icon="el-icon-edit"
-            :disabled="!activity.publishRequest"
+            :disabled="activity.publishRequest!=1"
             @click="reject()"
           >
             Reject
@@ -42,26 +42,14 @@
 </template>
 
 <script>
-import researchApi from '@/api/edu/research'
-// import {xss} from '@kangc/v-md-editor'
-// import VueMarkdownEditor, {xss} from '@kangc/v-md-editor'
-// import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/cdn';
-// import createMermaidPlugin from '@kangc/v-md-editor/lib/plugins/mermaid/cdn';
-// import '@kangc/v-md-editor/lib/plugins/mermaid/mermaid.css';
-// import createTodoListPlugin from '@kangc/v-md-editor/lib/plugins/todo-list/index';
-// import '@kangc/v-md-editor/lib/plugins/todo-list/todo-list.css';
-
-// import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-// import '@kangc/v-md-editor/lib/theme/style/github.css';
-// import hljs from 'highlight.js';
-// VueMarkdownEditor.use(githubTheme, {Hljs: hljs,})
-// VueMarkdownEditor.use(createMermaidPlugin())
-// VueMarkdownEditor.use(createKatexPlugin())
-// VueMarkdownEditor.use(createTodoListPlugin())
+import activityApi from '@/api/edu/activity'
 export default {
     data() {
         return {
-            activity: [],
+            activity: {
+              publishRequest: false,
+
+            },
         }
     },
     created() {
@@ -74,27 +62,30 @@ export default {
     },
     methods: {
         getActivity() {
-            researchApi.getActivity(this.activity.id)
+            activityApi.getActivity(this.activity.id)
                 .then(response => {
-                    this.activity= response.data.item
-                    console.log(response)
+                    this.activity= response.data.activity
+                    this.activity.markdown = response.data.markdown.markdown
+                    
+                    console.log(this.activity)
+                    
                 })
         },
         publish(){
-            researchApi.publish(this.activity.id)
+            activityApi.publish(this.activity.id)
             .then(()=>{
                 this.$message({
-                    message: 'Research Published',
-                    type: 'success'
+                    type: 'success',
+                    message: 'activity Published',
                 })
             })
 
         },
         reject(){
-            researchApi.reject(this.activity.id).then(
+            activityApi.reject(this.activity.id).then(
                 ()=> {
                     this.$message({
-                        type: 'info',
+                        type: 'success',
                         message: 'Request rejected'
                     })
                 }

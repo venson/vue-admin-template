@@ -53,6 +53,14 @@
                 </el-button>
               </router-link>
               <el-button
+                type="primary"
+                size="mini"
+                icon="el-icon-edit"
+                @click="preview(scope.row.id)"
+              >
+                Preview
+              </el-button>
+              <el-button
                 v-permission="['activity.delete']"
 
                 type="danger"
@@ -109,6 +117,9 @@ export default {
                     this.getRequestList()
             })
 
+        },
+        preview(id){
+          this.$router.push(`publish/${id}`)
         },
         reject(id){
             activityApi.publishReject(id).then(

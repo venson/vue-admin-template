@@ -5,19 +5,18 @@
     <el-container height="700px">
       <el-main>
         <!-- Markdown editor -->
-      <el-form>
-        <el-form-item label="Title">
-          <el-input v-model="activity.title"></el-input>
-        </el-form-item>
-        <el-form-item label="Date">
-          <el-date-picker
-          v-model="activity.activityDate"
-          type="date"
-          placeholder="Pick Activity Date"
-          >
-          </el-date-picker>
-        </el-form-item>
-      </el-form>
+        <el-form>
+          <el-form-item label="Title">
+            <el-input v-model="activity.title" />
+          </el-form-item>
+          <el-form-item label="Date">
+            <el-date-picker
+              v-model="activity.activityDate"
+              type="date"
+              placeholder="Pick Activity Date"
+            />
+          </el-form-item>
+        </el-form>
         <div>
           <el-button
             type="primary"
@@ -59,6 +58,7 @@ import {mapGetters} from 'vuex'
 import permission from '@/directive/permission/index'
 
 export default {
+  directives: { permission },
   data() {
     return {
       activity: {},
@@ -67,7 +67,6 @@ export default {
 
     }
   },
-  directives: { permission },
   computed: {
     ...mapGetters([
       'name',
@@ -93,8 +92,8 @@ export default {
             activityApi.getActivity(this.activity.id)
             .then(response =>{
                 this.activity = response.data.activity
-                this.activity.markdown = response.data.markdown
-                this.activityBack = this.activity
+                this.activity.markdown = response.data.markdown.markdown
+                this.activityBack = Object.assign({},this.activity)
                 this.activity.lastModified
                 this.activity.lastModifiedMemberId = this.id
                 this.activity.lastModifiedMemberName = this.name
@@ -123,6 +122,8 @@ export default {
     },
 
         saveActivity(){
+          console.log(this.activity)
+          console.log(this.activityBack)
             if(this.modifiedCheck()){
                 this.$message({
                     type: 'info',
@@ -133,13 +134,16 @@ export default {
             if(this.activity.id ==null){
             activityApi.addActivity(this.activity)
             .then((response) =>{
+              console.log(response)
                 this.$message({
                     type: 'success',
                     message: 'Add Activity successed'
                 })
-                this.activity.id = response.data.item
+                this.activity.id = response.data.id
+                console.log(this.activity)
 
-                this.activityBack = this.activity
+
+                this.activityBack = Object.assign({},this.activity)
             })
             }else{
             activityApi.updateActivity(this.activity.id, this.activity)
@@ -154,6 +158,13 @@ export default {
         },
 
         requestPublish(){
+            if(!this.activity.id){
+              this.$message({
+                type: 'warning',
+                message: 'Please save before request'
+              })
+              return 
+            }
             if(this.activity.publishRequest){
                 this.$message({
                     type: 'info',

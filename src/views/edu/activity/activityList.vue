@@ -28,9 +28,7 @@
       </el-button>
     </el-form>
 
-    <el-button
-      @click="newActivity"
-    >
+    <el-button @click="newActivity">
       New Activity
     </el-button>
     <!-- 表格列表 -->
@@ -55,7 +53,10 @@
         min-width="100"
       >
         <template slot-scope="scope">
-          {{ scope.row.isPublished=== true ? "已发布" : "未发布" }}
+          {{ (scope.row.isPublished === true ? "已发布" : "未发布") +
+            (scope.row.publishRequest === 1 ? "/Requested" : "")
+              + (scope.row.publishRequest === 2 ? "/rejected" : "")
+          }}
         </template>
       </el-table-column>
       <el-table-column
@@ -64,21 +65,18 @@
         align="center"
       >
         <template slot-scope="scope">
-          <router-link 
+          <el-button
             v-permission="['activity.edit']"
-            :to="'/activity/activityInfo/' + scope.row.id"
+            type="primary"
+            size="mini"
+            icon="el-icon-edit"
+            :disabled="scope.row.publishRequest === 1"
+            @click="edit(scope.row.id)"
           >
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-            >
-              Edit
-            </el-button>
-          </router-link>
+            Edit
+          </el-button>
           <el-button
             v-permission="['activity.delete']"
-
             type="danger"
             size="mini"
             icon="el-icon-delete"
@@ -109,58 +107,62 @@
 import activityApi from '@/api/edu/activity'
 import permission from '@/directive/permission/index'
 export default {
-    directives: { permission },
-    data(){
-        return {
-            courseList: [],
-            pageActivity:{
-                records: [] ,
-                total: 0
-            },
-            filter: {
-                title: '',
-                begin: '',
-                end: '',
-            },
-            limit: 10,
-            page: 1,
+  directives: { permission },
+  data() {
+    return {
+      courseList: [],
+      pageActivity: {
+        records: [],
+        total: 0
+      },
+      filter: {
+        title: '',
+        begin: '',
+        end: '',
+      },
+      limit: 10,
+      page: 1,
 
-        }
+    }
+  },
+  created() {
+    this.getPageList()
+    // console.log(this.buttons)
+  },
+  methods: {
+    getPageList(page = 1) {
+      activityApi.getPageActivity(page, this.limit, this.filter)
+        .then(response => {
+          console.log(response)
+          this.pageActivity = response.data
+          console.log(this.pageActivity)
+        })
     },
-    created() {
-        this.getPageList()
-        // console.log(this.buttons)
-    },
-    methods:{
-        getPageList(page=1){
-            activityApi.getPageActivity(page,this.limit, this.filter)
-            .then(response=>{
-                console.log(response)
-                this.pageActivity = response.data
-                console.log(this.pageActivity)
-            })
-        },
-    handleSizeChange(val){
+    handleSizeChange(val) {
       this.limit = val
       this.getPageList(this.page)
 
     },
-    newActivity(){
-      this.$router.push({path: 'edu/activity/activityInfo'})
-    }
-
+    newActivity() {
+      this.$router.push({ path: 'activityInfo' })
 
     },
-    deleteActivity(id){
+    edit(id) {
+      this.$router.push({ path: `activityInfo/${id}` })
+    },
+
+    deleteActivity(id) {
       activityApi.deleteActivity(id)
-      .then(()=>{
-        this.$message({
-          type:'success',
-          message: 'Delete successed'
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete successed'
+          })
+          this.getPageActivity(this.page)
         })
-        this.getPageActivity(this.page)
-      })
     }
+
+  },
 
 }   
 </script>
