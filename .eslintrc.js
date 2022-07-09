@@ -12,7 +12,7 @@ module.exports = {
         "plugin:vue/recommended"
     ],
     "parserOptions": {
-        "ecmaVersion": 6,
+        "ecmaVersion": 2018, //fix ...MapGetters ... unexcepted token
         "sourceType": "module",
         "allowImportExportEverywhere": true,
         "ecmaFeatures": {
