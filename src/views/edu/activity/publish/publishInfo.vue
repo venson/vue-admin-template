@@ -3,36 +3,40 @@
     class="app-container"
     height="800px"
   >
-    <el-header>
-      <h2 style="text-align: center">
-        activity
-      </h2>
-    </el-header>
     <el-container height="700px">
       <el-main>
+        <h2 style="text-align: center">
+          activity
+        </h2>
         <!-- 表格列表 -->
         <div>
+          <div class="author">
+            <span class="author">{{ activity.authorMemberName }}</span> 
+            <span class="date">{{ activity.activityDate }}</span>
+          </div>
+          <v-md-preview
+            :text="activity.markdown"
+          />
+        </div>
+        <div class="operateButton">
           <el-button
             type="primary"
             size="mini"
-            icon="el-icon-edit"
+            icon="el-icon-finished"
             :disabled="activity.publishRequest!=1"
             @click="publish()"
           >
             Publish
           </el-button>
           <el-button
-            type="primary"
+            type="danger"
             size="mini"
-            icon="el-icon-edit"
+            icon="el-icon-refresh-left"
             :disabled="activity.publishRequest!=1"
             @click="reject()"
           >
             Reject
           </el-button>
-          <v-md-preview
-            :text="activity.markdown"
-          />
         </div>
         <!-- </el-main> -->
         <!-- </el-container> -->
@@ -95,3 +99,12 @@ export default {
 }
 
 </script>
+<style lang="css" scoped>
+.author,.date{
+  padding: 10px 20px 10px 20px;
+}
+.operateButton{
+  float: right;
+  padding-right: 30px;
+}
+</style>
