@@ -53,7 +53,7 @@
             添加菜单
           </el-button>
           <el-button
-            v-if="scope.row.level == 3 && hasPerm('permission.add')"
+            v-if="scope.row.level === 3 && hasPerm('permission.add')"
             type="text"
             size="mini"
             @click="() => {dialogPermissionVisible = true, permission.pid = scope.row.id}"
@@ -61,7 +61,7 @@
             添加功能
           </el-button>
           <el-button
-            v-if="scope.row.level == 4 && hasPerm('permission.update')"
+            v-if="scope.row.level === 4 && hasPerm('permission.edit')"
             type="text"
             size="mini"
             @click="() => updateFunction(scope.row)"
@@ -69,7 +69,7 @@
             修改功能
           </el-button>
           <el-button
-            v-if="scope.row.level != 4 && hasPerm('permission.update')"
+            v-if="scope.row.level !== 4 && hasPerm('permission.edit')"
             type="text"
             size="mini"
             @click="() => getById(scope.row)"
@@ -288,7 +288,7 @@ export default {
           if (this.permission.id) {
             this.update(this.permission)
           } else {
-            menu.saveLevelOne(this.permission).then(response => {
+            menu.saveLevelOne(this.permission).then(() => {
               this.dialogPermissionVisible = false
               this.$message({
                 type: 'success',
@@ -305,7 +305,7 @@ export default {
     },
     appendLevelOne() {
       menu.saveLevelOne(this.menu)
-        .then(response => {
+        .then(() => {
           this.dialogFormVisible = false
           this.$message({
             type: 'success',
@@ -316,7 +316,7 @@ export default {
           this.menu = {...menuForm}
           this.permission = {...perForm}
         })
-        .catch(response => {
+        .catch(()=> {
           // 你们写：判断点击取消清空一下
           this.dialogFormVisible = false
           this.$message({
@@ -346,7 +346,7 @@ export default {
 
     update(obj) {
       // debugger
-      menu.update(obj).then(response => {
+      menu.update(obj).then(()=> {
         this.dialogFormVisible = false
         this.$message({
           type: 'success',
@@ -359,7 +359,7 @@ export default {
     },
     appendLevelTwo() {
       menu.saveLevelOne(this.menu)
-        .then(response => {
+        .then(()=> {
           // 1、把文本框关
           this.dialogFormVisible = false
           // 2、提示成功
@@ -373,7 +373,7 @@ export default {
           this.menu = {...menuForm}
           this.permission = {...perForm}
         })
-        .catch(response => {
+        .catch(()=> {
           // 1、把文本框关
           this.dialogFormVisible = false
           // 2、提示成功

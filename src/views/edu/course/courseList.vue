@@ -30,7 +30,7 @@
 
     <!-- 表格列表 -->
     <el-table
-      :data="courseList"
+      :data="pageInfo.records"
       stripe
       style="width: 100%"
     >
@@ -40,56 +40,70 @@
         min-width="180"
       />
       <el-table-column
-        label="教师"
+        label="主讲"
         min-width="100"
         prop="memberName"
       />
       <el-table-column
-        prop="lessonNum"
+        prop="totalHour"
         label="课时"
         min-width="80"
       />
       <el-table-column
         prop="status"
         label="状态"
-        min-width="80"
+        min-width="180"
       >
         <template slot-scope="scope">
-          {{ scope.row.status === "Normal" ? "已发布" : "未发布" }}
+          {{ scope.row.isPublished ? "published" : "unpublished" }}
+          {{ scope.row.isModified ? "/modified" :"" }}
+          {{ scope.row.review === 1 ? "reviewing" :"" }}
+          {{ scope.row.review === 2 ? "/rejected" :"" }}
         </template>
       </el-table-column>
       <el-table-column
         label="操作"
-        min-width="400"
+        min-width="200"
         align="center"
       >
         <template slot-scope="scope">
-          <router-link :to="'/course/info/' + scope.row.id">
+          <el-button-group>
             <el-button
+              v-permission="['course.edit.info']"
               type="primary"
               size="mini"
-              icon="el-icon-edit"
+              @click="editDesc(scope.row.id)"
             >
-              Info
+              Desc
             </el-button>
-          </router-link>
-          <router-link :to="'/course/chapter/' + scope.row.id">
             <el-button
+              v-permission="['course.edit.content']"
               type="primary"
               size="mini"
-              icon="el-icon-edit"
+              @click="editContent(scope.row.id)"
             >
-              Lecture
+              Content
             </el-button>
-          </router-link>
-          <el-button
-            type="danger"
-            size="mini"
-            icon="el-icon-delete"
-            @click="deleteCourse(scope.row.id)"
-          >
-            删除
-          </el-button>
+            <el-button
+              v-permission="['course.edit.preview']"
+              type="primary"
+              size="mini"
+              @click="preview(scope.row.id)"
+            >
+              preview
+            </el-button>
+          </el-button-group>
+
+          <el-button-group>
+            <el-button
+              v-permission="['course.remove']"
+              type="danger"
+              size="mini"
+              @click="deleteCourse(scope.row.id)"
+            >
+              Delete
+            </el-button>
+          </el-button-group>
         </template>
       </el-table-column>
     </el-table>
@@ -102,7 +116,7 @@
       :page-size="limit"
       :page-sizes="[5, 10, 20]"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
+      :total="pageInfo.total"
       @size-change="handleSizeChange"
       @current-change="getCourseList"
     />
@@ -112,21 +126,48 @@
 
 <script>
 import course from '@/api/edu/course'
+import { mapGetters } from 'vuex'
+import permission from '@/directive/permission/index'
 export default {
+  directives: { permission },
   data() {
     return {
-      courseList: null,
+      pageInfo: {
+        records: [],
+        hasNext: '',
+        hasPrevious: '',
+        current: 0,
+        pages:0,
+        size: 0,
+        total: 0,
+      },
       page: 1,
-      limit: 8,
+      limit: 10,
       condition: "",
-      total: 0,
 
     }
+  },
+  computed: {
+    ...mapGetters([
+      'name',
+      'id',
+      'buttons'
+    ])
+
   },
   created() {
     this.getCourseList()
   },
   methods: {
+    preview(id){
+      this.$router.push({path: `preview/${id}`})
+    },
+    editDesc(id){
+      this.$router.push({path: `info/${id}`})
+    },
+    editContent(id){
+      this.$router.push({path: `content/${id}`})
+    },
     handleSizeChange(val){
       this.limit = val
       this.getCourseList(this.page)
@@ -134,11 +175,11 @@ export default {
     },
     getCourseList(page = 1) {
       this.page = page
-      course.getCourseList(this.page, this.limit, this.condition)
+      course.getCourseList(page, this.limit, this.condition)
         .then(response => {
-          console.log(response)
-          this.courseList = response.data.row
-          this.total = response.data.total
+          this.pageInfo = response.data
+          console.log(this.pageInfo)
+          console.log(this.pageInfo.total)
         })
     },
     deleteCourse(id) {

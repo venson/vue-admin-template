@@ -1,10 +1,10 @@
 import request from "@/utils/request";
+const url='/eduservice/admin/edu-member'
 
 export default {
   getMemberListPage(current, limit, memberQuerry) {
     return request({
-      // url: '/eduservice/edu-member/'+ current ,
-      url: `/eduservice/edu-member/pageMemberCondition/${current}/${limit}`,
+      url: `${url}/${current}/${limit}`,
       method: "post",
       data: memberQuerry,
     });
@@ -12,14 +12,14 @@ export default {
 
   deleteMemberById(id) {
     return request({
-      url: `/eduservice/edu-member/${id}`,
+      url: `${url}${id}`,
       method: "delete",
     });
   },
 
   addMember(member) {
     return request({
-      url: `/eduservice/edu-member/addMember`,
+      url: `${url}`,
       method: "post",
       data: member,
     });
@@ -27,14 +27,14 @@ export default {
 
   getMemberInfoById(id) {
     return request({
-      url: `/eduservice/edu-member/getMember/${id}`,
+      url: `${url}/${id}`,
       method: "get"
     });
   },
   updateMember(member){
     return request({
-      url: `/eduservice/edu-member/updateMember`,
-      method: 'post',
+      url: `${url}`,
+      method: 'put',
       data: member
     })
   }

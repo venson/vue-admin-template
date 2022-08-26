@@ -22,13 +22,19 @@
       <el-button
         type="default"
         icon="el-icon-refresh-left"
-        @click="resetData()"
+        @click="resetFilter()"
       >
         清空
       </el-button>
     </el-form>
 
     <!-- 表格列表 -->
+    <el-button
+      type="success"
+      @click="newScholar"
+    >
+      New
+    </el-button>
     <el-table
       :data="scholarPage.records"
       stripe
@@ -64,20 +70,21 @@
         align="center"
       >
         <template slot-scope="scope">
-          <router-link :to="'/scholar/info/' + scope.row.id">
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-            >
-              Edit
-            </el-button>
-          </router-link>
           <el-button
+            v-permission="['scholar.edit']"
+            type="primary"
+            size="mini"
+            icon="el-icon-edit"
+            @click="editScholar(scope.row.id)"
+          >
+            Edit
+          </el-button>
+          <el-button
+            v-permission="['scholar.remove']"
             type="danger"
             size="mini"
             icon="el-icon-delete"
-            @click="deleteCourse(scope.row.id)"
+            @click="deleteScholar(scope.row.id)"
           >
             删除
           </el-button>
@@ -103,7 +110,11 @@
 
 <script>
 import scholarApi from '@/api/edu/scholar'
+import {mapGetters} from "vuex";
+import permission from "@/directive/permission/permission";
+
 export default {
+  directives: { permission },
   data() {
     return {
         scholarPage: {
@@ -112,7 +123,6 @@ export default {
             hasNext: '',
 
         },
-      courseList: null,
       page: 1,
       limit: 8,
       condition: "",
@@ -120,13 +130,19 @@ export default {
 
     }
   },
+  computed:{
+    ...mapGetters([
+      'id',
+      'buttons'
+    ])
+  },
   created() {
     this.getPageScholar()
   },
   methods: {
     handleSizeChange(val){
       this.limit = val
-      this.getScholarPage(this.page)
+      this.getPageScholar(this.page)
 
     },
     getPageScholar(page = 1) {
@@ -138,22 +154,32 @@ export default {
           console.log(this.scholarPage)
         })
     },
-    deleteCourse(id) {
+    deleteScholar(id) {
       this.$confirm('Delete the Article？', 'Prompt', {
         confirmButtonText: "Confirm",
         cancelButtonText: "Cancel",
         type: "warning"
       })
         .then(() => {
-          course.deleteScholar(id)
+          scholarApi.deleteScholar(id)
             .then(() => {
               this.$message({
                 type: 'success',
                 message: "Deletion success"
               })
-              this.getScholarPage()
+              this.getPageScholar(this.page)
             })
         })
+    },
+    editScholar(id){
+      this.$router.push({path: `/scholar/info/${id}`})
+    },
+    newScholar(){
+      this.$router.push({path: `/scholar/info`})
+
+    },
+    resetFilter(){
+      this.condition=''
     }
   },
 

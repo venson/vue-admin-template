@@ -1,30 +1,35 @@
 import request from '@/utils/request'
+const url='/eduservice/admin/edu-content'
 
 export default {
-    getChapterContent(id){
+    getTreeNode(courseId){
         return request({
-            url: `/eduservice/edu-content/chapter/${id}`,
+            url: `${url}/${courseId}`,
             method: 'get'
         })
     },
-    getSectionContent(id){
+    getChapter(chapterId){
+        return request({
+            url: `${url}/chapter/${chapterId}`,
+            method: 'get'
+        })
+    },
+    getSection(sectionId){
+        return request({
+            url: `${url}/section/${sectionId}`,
+            method: 'get'
+        })
+    },
+    getChapterMarkdown(chapterId){
+        return request({
+            url: `${url}/chaptermd/${chapterId}`,
+            method: 'get'
+        })
+    },
+    getSectionMarkdown(id){
         return request({
             url: `/eduservice/edu-content/section/${id}`,
             method: 'get'
         })
     },
-    updateContent(content){
-        return request({
-            url: `/eduservice/edu-content/${content.id}`,
-            method: 'put',
-            data: content
-        })
-    },
-    saveContent(content){
-        return request({
-            url: `/eduservice/edu-content`,
-            method: 'post',
-            data: content
-        })
-    }
 }

@@ -1,20 +1,29 @@
 <template>
   <div>
     <el-container class="app-container">
-      <el-header height="140px">
-        <h2 style="text-align: center">
+      <el-header height="100px">
+        <h3 style="text-align: center">
           New Course
-        </h2>
+        </h3>
         <el-steps
           :active="2"
           process-status="wait"
           align-center
-          style="margin: bottom 4px"
+          style="margin-bottom: 4px"
           finish-status="success"
         >
-          <el-step title="Course Base Info" />
-          <el-step title="Edit Course" />
-          <el-step title="Publish" />
+          <el-step
+            title="Course Base Info"
+            @click.native="stepOne"
+          />
+          <el-step
+            title="Edit Course"
+            @click.native="stepTwo"
+          />
+          <el-step
+            title="Preview"
+            @click.native="stepThree"
+          />
         </el-steps>
       </el-header>
       <el-container height="700px">
@@ -36,12 +45,14 @@
             <span
               slot-scope="{ node, data }"
               class="custom-tree-node"
-              style="width:200px;height:28px"
+              style="width:100%;height:45px"
             >
-              <span style="display:inline-block"> {{ node.label }}</span>
-              <span style="position:absolute;right:0px">
+              <span style="display:block">{{ node.label }}</span>
+
+              <span style="position:absolute;right:0">
                 <el-button
                   v-if="node.level === 1"
+                  v-permission="['course.edit.content']"
                   type="text"
                   size="mini"
                   @click="newSection(node)"
@@ -49,13 +60,15 @@
                   New
                 </el-button>
                 <el-button
+                  v-permission="['course.edit.content']"
                   type="text"
                   size="mini"
-                  @click="editChapterSection(node, data)"
+                  @click="editContent(node, data)"
                 >
                   <i class="el-icon-edit" />
                 </el-button>
                 <el-button
+                  v-permission="['course.edit.remove']"
                   type="text"
                   size="mini"
                   @click="() => remove(node, data)"
@@ -64,32 +77,75 @@
                 </el-button>
 
               </span>
+              <span style="float:left" />
+              <el-tag
+                v-if="data.review==='NONE'"
+                type=""
+                size="mini"
+                effect="dark"
+              >New</el-tag>
+              <el-tag
+                v-if="data.review ==='REJECTED'"
+                type="danger"
+                size="mini"
+                effect="dark"
+              >Rejected</el-tag>
+              <el-tag
+                v-if="data.review ==='APPLIED'"
+                type="danger"
+                size="mini"
+                effect="dark"
+              >Applied</el-tag>
+              <el-tooltip
+                content="Reviewed and published"
+                placement="top"
+                class="m2"
+              >
+                <el-tag
+                  v-if="data.isPublished ===true"
+                  type="success"
+                  size="mini"
+                  effect="dark"
+                >P</el-tag>
+              </el-tooltip>
+              <el-tooltip
+                content="Modified Since Review"
+                placement="top"
+                class="m2"
+              >
+                <el-tag
+                  v-if="data.isModified ===true"
+                  type="danger"
+                  size="mini"
+                  effect="dark"
+                >M</el-tag>
+              </el-tooltip>
             </span>
           </el-tree>
         </el-aside>
         <el-main>
-          <!-- chapter section form -->
-          <el-form :model="editData">
+          <!-- content edit  -->
+          <el-form :model="editBuffer">
             <el-form-item
-              :label="editData.label"
+              :label="editBufferLabel"
               label-width="60px"
             >
-              <el-input v-model="editData.title" />
+              <el-input v-model="editBuffer.title" />
             </el-form-item>
 
             <el-form-item
-              v-if="editData.level === 2"
+              v-if="editBufferLevel === 2"
               label="Bilibili"
               label-width="60px"
             >
-              <el-input v-model="editData.videoLink" />
+              <el-input v-model="editBuffer.videoLink" />
             </el-form-item>
             <el-form-item
               label="Sort"
               label-width="60px"
             >
               <el-input
-                v-model="editData.sort"
+                v-model="editBuffer.sort"
                 class="el-input-sort"
               />
               <el-button
@@ -103,11 +159,11 @@
           </el-form>
           <!-- Markdown editor -->
           <v-md-editor
-            v-model="editData.content"
+            v-model="editBuffer.markdown.markdown"
             :left-toolbar="lefttoolbar"
             :disabled-menus="[]"
             highlight-current
-            height="800px"
+            height="400px"
             @upload-image="handleUploadImage"
           />
           <div>
@@ -129,10 +185,11 @@
 </template>
 
 <script>
-import chapterApi from '@/api/edu/chapter'
 import contentApi from '@/api/edu/content'
+import chapterApi from '@/api/edu/chapter'
 import sectionApi from '@/api/edu/section'
 import ossApi from '@/api/oss'
+import Compressor from 'compressorjs'
 export default {
   data() {
     return {
@@ -145,15 +202,13 @@ export default {
       saveBtnDisabled: false,
       courseId: "",
       chapterSectionList: [],
-      section: {
-        title: "",
-      },
       content: {
         id: '',
         chapterSectionId: '',
         chapterSection: '',
         content: ''
       },
+      sectionBack:{},
       section: {
         title: "",
         id: "",
@@ -162,22 +217,24 @@ export default {
         chapterId: "",
         isFree: true,
       },
+      chapterBack:{},
       chapter: {
         courseId: "",
         title: "",
         sort: 0,
       },
-      editData: {
-        label: 'Title',
-        edit: false,
-        id: '',
-        parentId: '',
-        level: '',
+      editBuffer:{
         title: '',
-        content: '',
+        courseId: '',
         sort: '',
         videoLink: '',
+        markdown:{
+          markdown: "",
+        }
       },
+      editBufferLevel: '',
+      editBufferId: '',
+      editBufferLabel: '',
 
       saveSectionBtnDisabled: false,
     };
@@ -186,25 +243,32 @@ export default {
     if (this.$route.params && this.$route.params.id) {
       this.courseId = this.$route.params.id
       console.log("courseId at start:" + this.courseId)
-      this.getChapterSection()
+      this.getTreeNode()
     }
   },
   methods: {
-    editChapterSection(node, data) {
-      this.editData.level = node.level
-      this.editData.id = data.id
+    stepOne(){
+      this.$router.push({path: `/course/info/${this.courseId}`})
+    },
+    stepTwo(){
+      this.$router.push({path: `/course/Content/${this.courseId}`})
+    },
+    stepThree(){
+      this.$router.push({path: `/course/preview/${this.courseId}`})
+    },
+    editContent(node, data) {
+      this.editBufferLevel = node.level
+      this.editBufferId = data.id
       console.log("data")
       console.log(data)
       console.log("node")
       console.log(node)
       if (this.isChapter(node)) {
-        this.editData.label = 'Chapter'
-        this.getChapter(data.id)
-        this.getChapterContent(data.id)
+        this.editBufferLabel = 'Chapter'
+        this.getChapterById(data.id)
       } else {
-        this.editData.label = 'Section'
-        this.getSection(data.id)
-        this.getSectionContent(data.id)
+        this.editBufferLabel = 'Section'
+        this.getSectionById(data.id)
       }
 
       console.log(this.editData)
@@ -225,41 +289,49 @@ export default {
     },
     handleUploadImage(event, insertImage, files) {
 
-      var formdata = new FormData()
-      formdata.append('file', files[0])
-      let url = '';
-      let desc = files[0].name;
-      ossApi.uploadImage(formdata)
-        .then(response => {
-          console.log(response.data)
-          url = response.data.url
-          insertImage({
-            url: url,
-            desc: desc
-          });
-        })
+      let formData = new FormData();
+      new Compressor(files[0],{
+        quality: 0.6,
+        maxHeight: 600,
+        maxWidth: 1000,
+        fit: 'contain',
+        success(result){
+          formData.append('file', result,result.name)
+          let url = '';
+          let desc = files[0].name;
+          ossApi.uploadImage(formData)
+            .then(response => {
+              url = response.data.url
+              insertImage({
+                url: url,
+                desc: desc
+              });
+            })
+        }
+      })
 
     },
-    getSection(id) {
-      return Promise.resolve(
-        sectionApi.getSection(id)
+    getSectionById(id) {
+      // return Promise.resolve(
+        sectionApi.getSectionById(id)
           .then(response => {
             this.section = response.data.item;
-            this.editData.title = this.section.title
-            this.editData.sort = this.section.sort
-            this.editData.videoLink = this.section.videoLink
-          }))
+            this.sectionBack = Object.assign({},this.section)
+            this.editBuffer = this.section;
+          })
+          // )
 
     },
-    getChapter(id) {
-      return Promise.resolve(
-        chapterApi.getChapter(id)
+    getChapterById(id) {
+      // return Promise.resolve(
+        chapterApi.getChapterById(id)
           .then(response => {
             this.chapter = response.data.item;
-            this.editData.title = this.chapter.title
-            this.editData.sort = this.chapter.sort
-            this.editData.videoLink = ''
-          }))
+            console.log(this.chapter)
+            this.chapterBack = Object.assign({},this.chapter)
+            this.editBuffer = this.chapter;
+          })
+          // )
     },
     //  Deleting Section by id
     deleteSection(id) {
@@ -267,9 +339,9 @@ export default {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: 'warning'
-      }).then(response => {
-        section.deleteSection(id).then(response => {
-          this.getChapterSection()
+      }).then(() => {
+        sectionApi.deleteSectionById(id).then(() => {
+          this.getTreeNode()
         })
       })
 
@@ -286,103 +358,66 @@ export default {
       this.dialogSectionFormVisible = false
     },
     // init  editData
-    initNewEditData() {
-      this.editData.content = ''
-      this.editData.title = ''
-      this.editData.sort = 0
-      this.content.id = ''
+    initNewEditBuffer() {
+      this.editBuffer.courseId = this.courseId
+      this.editBuffer.title = '';
+      this.editBuffer.videoLink = '';
+      this.editBuffer.markdown.markdown = ''
+      this.editBuffer.sort = ''
     },
 
-    // new section
+    // new chapter
     newChapter() {
       console.log("new Chapter")
-      this.chapter = {}
-      this.initNewEditData()
-      this.editData.label = 'Chapter'
+      this.chapter = {markdown:{markdown:''}}
       this.chapter.courseId = this.courseId
-      this.editData.level = 1
-      console.log(this.editData)
+      this.initNewEditBuffer()
+      this.editBufferLabel = 'Chapter'
+      this.editBufferLevel = 1
     },
 
     newSection(node) {
       console.log("add Section")
-      console.log(node)
-      this.initNewEditData()
-      this.section = {}
-      this.editData.label = 'Section'
+      this.section = {markdown:{markdown:''}}
+      this.initNewEditBuffer()
+      this.editBufferLabel = 'Section'
       this.section.courseId = this.courseId
       this.section.chapterId = node.data.id
-      this.editData.level = 2
-      console.log(this.editData)
-      console.log(this.section)
+      this.editBufferLevel = 2
     },
 
-    setSection() {
-      this.section.title = this.editData.title
-      this.section.sort = this.editData.sort
-      this.section.videoLink = this.editData.videoLink
-    },
-
-    setChapter() {
-      this.chapter.title = this.editData.title
-      this.chapter.sort = this.editData.sort
+    saveBuffer(target){
+      if(target ==='section'){
+        this.section.title = this.editBuffer.title
+        this.section.sort = this.editBuffer.sort
+        this.section.videoLink = this.editBuffer.videoLink
+        this.section.markdown.markdown = this.editBuffer.markdown.markdown
+      }else if(target ==='chapter'){
+        this.chapter.title = this.editBuffer.title
+        this.chapter.sort = this.editBuffer.sort
+        this.chapter.markdown.markdown = this.editBuffer.markdown.markdown
+      }
     },
     updateSection() {
-      this.setSection()
+      this.saveBuffer('section')
       console.log("updateSection" + this.section)
-      sectionApi.updateSection(this.section).then((response) => {
+      sectionApi.updateSectionById(this.section.id,this.section).then(() => {
         this.$message({
           type: 'success',
           message: 'Section updated'
         });
-        this.getChapterSection()
+        this.getTreeNode()
       });
     },
-    // get the content for the section by id
-    getSectionContent(id) {
-      // debugger
-      return Promise.resolve(
-        contentApi.getSectionContent(id)
-          .then(response => {
-            if (response.data.item) {
-              this.editData.content = response.data.item.content
-              this.content = response.data.item
-              console.log("content")
-              console.log(this.content)
-            } else {
-              this.editData.content = "<h3>No Content available, edit right now</h3>"
-            }
-          }))
-
-    },
-    // get the content for the chapter by id
-    getChapterContent(id) {
-      return Promise.resolve(
-        contentApi.getChapterContent(id)
-          .then(response => {
-            if (response.data.item) {
-              this.editData.content = response.data.item.content
-              this.content = response.data.item
-              console.log("content")
-              console.log(this.content)
-            } else {
-              this.editData.content = "<h3>No Content available, edit right now</h3>"
-            }
-          })
-      )
-    },
     // get chapter section for tree display
-    getChapterSection() {
-      chapterApi.getChapterSection(this.courseId).then((response) => {
-        this.chapterSectionList = response.data.list;
+    getTreeNode() {
+      contentApi.getTreeNode(this.courseId).then((response) => {
+        this.chapterSectionList = response.data.tree;
+        console.log(response)
         console.log(this.chapterSectionList)
       });
     },
 
-    // previous button
-    previous() {
-      this.$router.push({ path: `/course/info/${this.courseId}` });
-    },
     // remove chapter
     removeChapter(id) {
       this.$confirm("此操作删除章节记录，是否继续？", "提示", {
@@ -390,119 +425,80 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
-        chapterApi.deleteChapter(id).then((response) => {
+        chapterApi.deleteChapterById(id).then(() => {
           this.$message({
             type: "success",
             message: "删除成功",
           });
-          this.getChapterSection();
+          this.getTreeNode();
         });
       });
     },
     saveChapter() {
-      this.setChapter()
-      return Promise.resolve(
+      this.saveBuffer('chapter')
         chapterApi.addChapter(this.chapter)
           .then(response => {
             this.$message({
               type: "success",
               message: 'Chapter added'
             });
-            console.log(response);
-            this.editData.id = response.data.id
+            this.editBuffer.id = response.data.id
             this.chapter.id = response.data.id
             console.log(this.chapter);
-            this.getChapterSection();
+            this.getTreeNode();
 
           })
-      )
     },
     saveSection() {
-      this.setSection()
-      return new Promise((resolve, reject) =>{
+      this.saveBuffer('section')
         sectionApi.addSection(this.section)
         .then(response => {
           this.$message({
             type: "success",
             message: 'Section added'
           });
-          this.editData.id = response.data.id;
+          this.editBuffer.id = response.data.id;
           this.section.id = response.data.id
-          this.getChapterSection();
-          resolve(response.data.id)
-        })})
-    },
+          this.getTreeNode();
+        })},
     updateChapter() {
-      this.setChapter()
-      chapterApi.updateChapter(this.chapter).then((response) => {
+      this.saveBuffer('chapter')
+      chapterApi.updateChapterById(this.chapter.id,this.chapter).then(() => {
         this.$message({
           type: "success",
           message: "Chapter updated",
         });
-        this.getChapterSection();
+        this.getTreeNode();
       });
     },
 
-    saveOrUpdateContent() {
-      // debugger
-      this.content.content = this.editData.content
-      console.log(this.editData)
-      this.content.chapterSectionId = this.editData.id
-      if (this.editData.level === 1) { this.content.chapterSection = 0 }
-      if (this.editData.level === 2) { this.content.chapterSection = 1 }
-
-      console.log("content")
-      console.log(this.content)
-      if (this.content.id) {
-        // debugger
-        contentApi.updateContent(this.content)
-          .then(response => {
-            this.$message({
-              type: "success",
-              message: "Content updated",
-            });
-          })
-      } else {
-        debugger
-        contentApi.saveContent(this.content)
-          .then(response => {
-            this.$message({
-              type: "success",
-              message: "Content add",
-            });
-          })
-      }
-
-    },
-    async saveOrUpdate() {
-      debugger
-      console.log("editData while saveorupdate")
-      console.log(this.editData)
-      if (this.editData.level === 1) {
-        debugger
+    saveOrUpdate() {
+      console.log("editBuffer content while saveorupdate")
+      if (this.editBufferLevel === 1) {
         if (this.chapter.id) {
            this.updateChapter();
         } else {
-          await this.saveChapter();
+          this.saveChapter();
         }
-      } else if (this.editData.level === 2) {
-        debugger
+      } else if (this.editBufferLevel === 2) {
         if (this.section.id) {
           this.updateSection();
         } else {
-          await this.saveSection();
+          this.saveSection();
 
         }
       }
-      // debugger
-      this.saveOrUpdateContent();
-      this.getChapterSection()
+      this.getTreeNode()
+    },
+    // previous button
+    previous() {
+      this.$router.push({ path: `/course/info/${this.courseId}` });
     },
     next() {
-      this.$router.push({ path: `/course/publish/${this.courseId}` });
+      this.$router.push({ path: `/course/preview/${this.courseId}` });
     },
-  },
-};
+  }
+}
 </script>
 <style scoped>
 .chapterList {
@@ -535,6 +531,17 @@ export default {
   font-size: 14px;
 }
 
+.contentMarker  {
+  float: left;
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: 14px;
+  padding-top: 2px;
+}
+
+::v-deep .el-tree-node__content{
+  height: 45px !important;
+}
 .sectionList {
   padding-left: 10px;
 }
@@ -554,13 +561,20 @@ export default {
   float: right;
   font-size: 12px;
 }
-
-.mavonEditor {
-  width: 100%;
-  height: 100%;
+.c_r{
+  color:red;
+}
+.c_g{
+  color:green;
+}
+.c_y{
+  color:yellow;
 }
 
 .el-input-sort {
   width: 100px
+}
+.m2{
+  margin: 2px;
 }
 </style>

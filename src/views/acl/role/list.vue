@@ -93,7 +93,7 @@
           </router-link>
           <router-link :to="'/acl/role/update/'+scope.row.id">
             <el-button
-              v-if="hasPerm('role.update')"
+              v-if="hasPerm('role.edit')"
               type="primary"
               size="mini"
               icon="el-icon-edit"

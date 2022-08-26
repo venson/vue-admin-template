@@ -28,7 +28,10 @@
       </el-button>
     </el-form>
 
-    <el-button @click="newActivity">
+    <el-button
+      v-permission="[' activity.add']"
+      @click="newActivity"
+    >
       New Activity
     </el-button>
     <!-- 表格列表 -->
@@ -76,7 +79,7 @@
             Edit
           </el-button>
           <el-button
-            v-permission="['activity.delete']"
+            v-permission="['activity.remove']"
             type="danger"
             size="mini"
             icon="el-icon-delete"
@@ -110,7 +113,6 @@ export default {
   directives: { permission },
   data() {
     return {
-      courseList: [],
       pageActivity: {
         records: [],
         total: 0
@@ -131,6 +133,7 @@ export default {
   },
   methods: {
     getPageList(page = 1) {
+      this.page = page
       activityApi.getPageActivity(page, this.limit, this.filter)
         .then(response => {
           console.log(response)
@@ -170,5 +173,5 @@ export default {
 
   },
 
-}   
+}
 </script>

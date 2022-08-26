@@ -1,14 +1,8 @@
 <template>
   <div class="app-container">
-    <el-input
-      v-model="filterText"
-      placeholder="Filter keyword"
-      style="margin-bottom:30px;"
-    />
-
     <el-tree
       ref="tree2"
-      :data="data2"
+      :data="memberList"
       :props="defaultProps"
       :filter-node-method="filterNode"
       class="filter-tree"
@@ -24,7 +18,7 @@ export default {
   data() {
     return {
       filterText: '',
-      data2: [],
+      memberList: [],
       defaultProps: {
         children: 'children',
         label: 'title'
@@ -44,8 +38,7 @@ export default {
     getAllSubjectList(){
       subject.getSubjectList()
       .then(response =>{
-          this.data2 = response.data.list
-          console.log(this.data2)
+          this.memberList = response.data.tree
         })
 
     },

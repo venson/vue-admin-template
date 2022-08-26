@@ -1,50 +1,43 @@
 import request from "@/utils/request";
-
+const url='/eduservice/admin/edu-course'
 export default {
   addCourseInfo(courseInfo) {
     return request({
-      url: `/eduservice/edu-course/addCourseInfo`,
+      url: `${url}`,
       method: "post",
       data: courseInfo
     })
   },
   getMemberList(){
     return request({
-      url: `/eduservice/edu-member/findAll`,
+      url: `${url}`,
       method: "get"
     })
   },
-  updateCourseInfo(courseInfo){
+  updateCourseInfo(id,courseInfo){
     return request({
-      url: `/eduservice/edu-course/updateCourseInfo`,
-      method: "post",
+      url: `${url}/${id}`,
+      method: "put",
       data: courseInfo
     })
   },
   getCourseInfo(id){
     return request({
-      url: `/eduservice/edu-course/getCourseInfo/${id}`,
+      url: `${url}/${id}`,
       method: "get"
     })
   },
 
-  getPublishCourseInfo(id){
+  getCoursePreviewInfo(id){
     return request({
-      url: `/eduservice/edu-course/publishCourseInfo/${id}`,
-      method: "get",
-    })
-  },
-
-  publishCourse(id){
-    return request({
-      url: `/eduservice/edu-course/publishCourse/${id}`,
-      method: "post",
+      url: `${url}/preview/${id}`,
+      method: "get"
     })
   },
 
   getCourseList(page,limit,condition){
     return request({
-      url: `/eduservice/edu-course/${page}/${limit}`,
+      url: `${url}/${page}/${limit}`,
       method: "post",
       data: condition
     })
@@ -52,7 +45,7 @@ export default {
 
   deleteCourse(id){
     return request({
-      url: `/eduservice/edu-course/${id}`,
+      url: `${url}/${id}`,
       method: "delete",
     })
   },

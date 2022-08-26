@@ -13,6 +13,7 @@
         <!-- Markdown editor -->
         <div>
           <el-button
+            v-permission="['research.edit']"
             type="primary"
             size="mini"
             icon="el-icon-folder-checked"
@@ -21,13 +22,13 @@
             save
           </el-button>
           <el-button
-            v-permission="research.request"
+            v-permission="['research.review.request']"
             type="primary"
             size="mini"
             icon="el-icon-collection"
             @click="publishApply"
           >
-            Request
+            Request Review
           </el-button>
           <!-- Markdown editor -->
           <v-md-editor
@@ -49,8 +50,11 @@
 <script>
 import researchApi from '@/api/edu/research'
 import ossApi from '@/api/oss'
+import {mapGetters} from "vuex";
+import permission from "@/directive/permission/permission";
 
 export default {
+  directives: { permission},
   data() {
     return {
       research: {},
@@ -58,6 +62,12 @@ export default {
       lefttoolbar: "undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code",
 
     }
+  },
+  computed:{
+    ...mapGetters([
+      'buttons'
+    ])
+
   },
   created() {
     // eslint-disable-next-line no-debugger
@@ -74,7 +84,7 @@ export default {
       researchApi.getResearchById(this.research.id)
         .then(response => {
           this.research = response.data.item
-          this.markdownBack = this.research.markdown
+          this.markdownBack = Object.assign({},this.research.markdown)
         })
     },
     handleUploadImage(event, insertImage, files) {

@@ -11,7 +11,7 @@
     <el-container height="700px">
       <el-main>
         <el-table
-          :data="requestList.records"
+          :data="activityList.records"
           stripe
           style="width: 100%"
         >
@@ -41,6 +41,7 @@
           >
             <template slot-scope="scope">
               <el-button
+                v-permission="['activity.review']"
                 type="primary"
                 size="mini"
                 icon="el-icon-edit"
@@ -49,8 +50,7 @@
                 Preview
               </el-button>
               <el-button
-                v-permission="['activity.delete']"
-
+                v-permission="['activity.review.reject']"
                 type="danger"
                 size="mini"
                 icon="el-icon-delete"
@@ -73,22 +73,25 @@ export default {
     directives: { permission},
     data() {
         return {
-            requestList: [],
+            activityList: {
+              records: [],
+
+            },
             page: 1,
             limit: 10,
 
         }
     },
     created() {
-        this.getRequestList()
+        this.getPageActivityReviewList()
     },
     methods: {
-        getRequestList(page=1) {
+        getPageActivityReviewList(page=1) {
             activityApi.getPageRequestList(page, this.limit)
                 .then(response => {
-                    this.requestList = response.data
+                    this.activityList = response.data
                     console.log(response)
-                    console.log(this.requestList)
+                    console.log(this.activityList)
                 })
         },
         editactivity(id){
@@ -107,7 +110,7 @@ export default {
 
         },
         preview(id){
-          this.$router.push(`publish/${id}`)
+          this.$router.push(`review/${id}`)
         },
         reject(id){
             this.$confirm('Confirm Deletation?', 'Warning',{

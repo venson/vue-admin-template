@@ -6,14 +6,6 @@
       </el-form-item>
 
       <el-form-item label="Banner">
-        <!-- <el-upload
-          :show-file-list="false"
-          :on-success="handleImageUrlSuccess"
-          :before-upload="beforeImageUrlUpload"
-          :action="BASE_API+'/admin/product/fileUpload'"
-          class="avatar-uploader">
-          <img :src="banner.imageUrl" width="950px">
-        </el-upload> -->
         <el-upload
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
@@ -24,27 +16,9 @@
           <img
             v-if="banner.imageUrl"
             :src="banner.imageUrl"
-            class="avatar" 
+            class="avatar"
             width="900px"
           >
-        </el-upload>
-        <el-upload
-          class="avatar-uploader"
-          action="BASE_API + '/eduoss/fileoss'"
-          :auto-upload="false"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
-        >
-          <img
-            v-if="imageUrl"
-            :src="imageUrl"
-            class="avatar"
-          >
-          <i
-            v-else
-            class="el-icon-plus avatar-uploader-icon"
-          />
         </el-upload>
       </el-form-item>
 

@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const researchUrl = '/eduservice/edu-research'
+const researchUrl = '/eduservice/admin/edu-research'
 
 export default {
     getResearchList(){
@@ -21,29 +21,32 @@ export default {
             data: research
         })
     },
-    publishRequest(id){
+    requestReviewById(id, applyVo){
         return request({
-            url:  `${researchUrl}/publish/${id}`,
+            url:  `${researchUrl}/review/${id}`,
             method: 'post',
+            data: applyVo,
         })
     },
-    publish(id){
+    passReviewById(id, reviewVo){
         return request({
-            url: `${researchUrl}/publish/${id}`,
+            url: `${researchUrl}/review/${id}`,
             method: 'put',
+            data: reviewVo,
         })
     },
-    getPublishList(){
+    rejectReviewById(id,reviewVo){
         return request({
-            url: `${researchUrl}/publish`,
-            method: 'get',
+            url:  `${researchUrl}/review/reject/${id}`,
+            method: 'post',
+            data: reviewVo
         })
+    },
+    getResearchReviewList(){
+      return request({
+        url: `${researchUrl}/review`,
+        method: 'get'
+      })
+    }
 
-    },
-    publishReject(id){
-        return request({
-            url:  `${researchUrl}/reject/${id}`,
-            method: 'put',
-        })
-    },
 }

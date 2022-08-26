@@ -1,49 +1,51 @@
 import request from '@/utils/request'
-const methodologyUrl = '/eduservice/edu-methodology'
+const url = '/eduservice/admin/edu-methodology'
 
 export default {
     getMethodologyList(){
         return request({
-            url:  `${methodologyUrl}`,
+            url:  `${url}`,
             method: 'get'
         })
     },
     getMethodologyById(id){
         return request({
-            url:  `${methodologyUrl}/${id}`,
+            url:  `${url}/${id}`,
             method: 'get'
         })
     },
     updateMethodology(id, methodology){
         return request({
-            url:  `${methodologyUrl}/${id}`,
+            url:  `${url}/${id}`,
             method: 'put',
             data: methodology
         })
     },
-    publishRequest(id){
-        return request({
-            url:  `${methodologyUrl}/publish/${id}`,
-            method: 'post',
-        })
-    },
-    publish(id){
-        return request({
-            url: `${methodologyUrl}/publish/${id}`,
-            method: 'put',
-        })
-    },
-    getPublishList(){
-        return request({
-            url: `${methodologyUrl}/publish`,
-            method: 'get',
-        })
-
-    },
-    publishReject(id){
-        return request({
-            url:  `${methodologyUrl}/reject/${id}`,
-            method: 'put',
-        })
-    },
+  requestReviewById(id, applyVo){
+    return request({
+      url:  `${url}/review/${id}`,
+      method: 'post',
+      data: applyVo,
+    })
+  },
+  passReviewById(id, reviewVo){
+    return request({
+      url: `${url}/review/${id}`,
+      method: 'put',
+      data: reviewVo,
+    })
+  },
+  rejectReviewById(id,reviewVo){
+    return request({
+      url:  `${url}/review/reject/${id}`,
+      method: 'post',
+      data: reviewVo
+    })
+  },
+  getResearchReviewList(){
+    return request({
+      url: `${url}/review`,
+      method: 'get'
+    })
+  }
 }

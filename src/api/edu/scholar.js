@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-const scholarUrl='/eduservice/edu-scholar'
-const memberUrl='/eduservice/edu-member-scholar'
-const citationUrl='/eduservice/edu-scholar-citation'
+const scholarUrl='/eduservice/admin/edu-scholar'
+const memberUrl='/eduservice/admin/edu-member-scholar'
+const citationUrl='/eduservice/admin/edu-scholar-citation'
 export default {
     // method for scholar
     getPageScholar(page, limit){
@@ -26,12 +26,6 @@ export default {
         })
     },
 
-    deleteScholar(id){
-        return request({
-            url: `${scholarUrl}/${id}`,
-            method: 'delete',
-        })
-    },
     getScholar(id){
         return request({
             url: `${scholarUrl}/${id}`,
@@ -76,7 +70,7 @@ export default {
     },
     deleteMemberByMemberId(memberIdList){
         return request({
-            url: `${memberUrl}/member`,
+            url: `${memberUrl}/${memberIdList}`,
             method: 'delete'
 
         })
@@ -105,18 +99,5 @@ export default {
         })
     },
 
-    deleteMemberByScholarId(scholarId){
-        return request({
-            url: `${memberUrl}/${scholarId}`,
-            method: 'delete',
-        })
-    },
-    deleteMemberByMemberId(memberIdList){
-        return request({
-            url: `${memberUrl}/member`,
-            method: 'delete'
-
-        })
-    },
 
 }

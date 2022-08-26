@@ -117,7 +117,7 @@ export const constantRoutes = [
       {
         path: "list",
         name: "课程列表",
-        component: () => import("@/views/edu/course/list"),
+        component: () => import("@/views/edu/course/courseList"),
         meta: { title: "课程列表", icon: "tree" },
       },
       {

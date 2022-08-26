@@ -1,39 +1,32 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
+const url = '/eduservice/admin/edu-chapter'
 
-export default {
-  getChapterSection(id) {
-    return request({
-      url: `/eduservice/edu-chapter/getChapterSection/${id}`,
-      method: "get",
-    })
-  },
+export default{
+    getChapterById(id){
+        return request({
+            url: `${url}/${id}`,
+            method: 'get'
+        })
+    },
+    addChapter(chapterVo){
+        return request({
+            url: `${url}`,
+            method: 'post',
+            data: chapterVo
+        })
+    },
+    updateChapterById(id,chapterVo){
+        return request({
+            url: `${url}/${id}`,
+            method: 'put',
+            data: chapterVo
+        })
+    },
+    deleteChapterById(id){
+        return request({
+            url: `${url}/${id}`,
+            method: 'delete',
+        })
+    },
 
-  addChapter(chapter) {
-    return request({
-      url: `/eduservice/edu-chapter/addChapter`,
-      method: "post",
-      data: chapter
-    })
-  },
-  getChapter(id) {
-    return request({
-      url: `/eduservice/edu-chapter/getChapter/${id}`,
-      method: "get",
-    })
-  },
-
-  updateChapter(chapter) {
-    return request({
-      url: `/eduservice/edu-chapter/updateChapter`,
-      method: "post",
-      data: chapter
-    })
-  },
-
-  deleteChapter(id) {
-    return request({
-      url: `/eduservice/edu-chapter/${id}`,
-      method: "delete",
-    })
-  },
 }

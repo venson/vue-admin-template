@@ -1,37 +1,37 @@
 module.exports = {
-    "env": [
-      'plugin:vue/recommended',
-      'plugin:vue/essential',
-      'eslint:recommended',
-      'plugin:prettier/recommended'
-    ],
+    // "env": [
+    //   'plugin:vue/recommended',
+    //   'plugin:vue/essential',
+    //   'eslint:recommended',
+    //   'plugin:prettier/recommended'
+    // ],
 
     "extends": [
-        // "eslint:recommended",
+        "eslint:recommended",
         // "plugin:vue/essential",
         "plugin:vue/recommended"
     ],
 
-    "parserOptions": {
-        "ecmaVersion": 2018, //fix ...MapGetters ... unexcepted token
-        "sourceType": "module",
-        "allowImportExportEverywhere": true,
-        "ecmaFeatures": {
-            "modules": true
-        }
-
-    },
+    // "parserOptions": {
+    //     "ecmaVersion": 2018, //fix ...MapGetters ... unexcepted token
+    //     "sourceType": "module",
+    //     "allowImportExportEverywhere": true,
+    //     "ecmaFeatures": {
+    //         "modules": true
+    //     }
+    //
+    // },
 
     "plugins": [
         "vue"
     ],
 
-    "rules": {
-      "vue/no-use-v-if-with-v-for": ["error", {
-        "allowUsingIterationVar": true
-      }]
-  
-    },
+    // "rules": {
+    //   "vue/no-use-v-if-with-v-for": ["error", {
+    //     "allowUsingIterationVar": true
+    //   }]
+    //
+    // },
 
     root: true,
 

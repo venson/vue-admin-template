@@ -1,9 +1,10 @@
 import request from "@/utils/request";
+const url="/eduservice/admin/edu-subject"
 
 export default {
   getSubjectList() {
     return request({
-      url: `/eduservice/edu-subject/getAllSubject`,
+      url: `${url}`,
       method: "get",
     })
   }

@@ -17,7 +17,7 @@ export default {
           method: 'get'
         })
       },
-    
+
       save(user) {
         return request({
           url: `${api_name}/save`,
@@ -25,7 +25,7 @@ export default {
           data: user
         })
       },
-    
+
       updateById(user) {
         return request({
           url: `${api_name}/update`,
@@ -58,5 +58,18 @@ export default {
           method: 'delete',
           data:idList
         })
+      },
+      resetPassword(id){
+        return request({
+          url: `${api_name}/password/${id}`,
+          method: 'post',
+        })
+      },
+      updatePassword(passwordDTO){
+      return request({
+        url: `${api_name}/password`,
+        method: 'put',
+        data: passwordDTO
+      })
       }
 }

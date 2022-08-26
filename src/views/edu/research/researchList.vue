@@ -1,7 +1,6 @@
 <template>
   <el-container
     class="app-container"
-    height="800px"
   >
     <el-header>
       <h2 style="text-align: center">
@@ -12,15 +11,87 @@
       <el-main>
         <!-- Markdown editor -->
         <div
-          v-for="research in researchList" 
+          v-for="research in researchList"
           :key="research.id"
         >
-          <!-- <router-link :to="'/research/researchInfo/' + research.id"> -->
+          <h2
+            v-if="research.language==='zh'"
+            style="text-align: center"
+          >
+            中文
+          </h2>
+          <h2
+            v-if="research.language==='en'"
+            style="text-align: center"
+          >
+            English
+          </h2>
+          <el-tooltip
+            content="Modified since review"
+            placement="top"
+            class="m2"
+          >
+            <el-tag
+              v-if="research.isModified"
+              type="info"
+              size="medium"
+              effect="dark"
+            >
+              Modified
+            </el-tag>
+          </el-tooltip>
+          <!--          tag review rejected-->
+          <el-tooltip
+            content="Review Rejected"
+            placement="top"
+            class="m2"
+          >
+            <el-tag
+              v-if="research.status ==='REJECTED'"
+              type="danger"
+              size="medium"
+              effect="dark"
+            >
+              Applied
+            </el-tag>
+          </el-tooltip>
+          <!--          tag review applied-->
+          <el-tooltip
+            content="Review Applied"
+            placement="top"
+            class="m2"
+          >
+            <el-tag
+              v-if="research.status ==='APPLIED'"
+              type=""
+              size="medium"
+              effect="dark"
+            >
+              Applied
+            </el-tag>
+          </el-tooltip>
+          <!--          tag review finished-->
+          <el-tooltip
+            content="Review Applied"
+            placement="top"
+            class="m2"
+          >
+            <el-tag
+              v-if="research.status ==='FINISHED'"
+              type="success"
+              size="medium"
+              effect="dark"
+            >
+              Applied
+            </el-tag>
+          </el-tooltip>
           <el-button
+            v-permission="['research.edit']"
             type="primary"
             size="mini"
             icon="el-icon-edit"
             :disabled="research.publishRequest"
+            style="float:right"
             @click="editResearch(research.id)"
           >
             Edit
@@ -39,14 +110,24 @@
 
 <script>
 import researchApi from '@/api/edu/research'
+import {mapGetters} from "vuex";
+import permission from '@/directive/permission'
 
 export default {
+  directives: { permission },
     data() {
         return {
             researchList: [],
 
         }
     },
+  computed:{
+    ...mapGetters([
+      'id',
+      'buttons'
+    ])
+
+  },
     created() {
         this.getResearchList()
     },
@@ -65,3 +146,9 @@ export default {
 }
 
 </script>
+<style>
+.m2{
+  margin: 2px;
+}
+
+</style>

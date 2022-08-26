@@ -3,6 +3,7 @@
     <!-- 工具条 -->
     <div>
       <el-button
+        v-permission="['banner.add']"
         type="danger"
         size="mini"
         @click="addBanner()"
@@ -10,6 +11,7 @@
         Add
       </el-button>
       <el-button
+        v-permission="['banner.remove']"
         type="danger"
         size="mini"
         @click="removeBannerBatch()"
@@ -78,14 +80,15 @@
         align="center"
       >
         <template slot-scope="scope">
-          <router-link :to="'/cms/banner/update/' + scope.row.id">
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-edit"
-            />
-          </router-link>
           <el-button
+            v-permission="['banner.edit']"
+            type="primary"
+            size="mini"
+            icon="el-icon-edit"
+            @click="editBanner(scope.row.id)"
+          />
+          <el-button
+            v-permission="['banner.remove']"
             type="danger"
             size="mini"
             icon="el-icon-delete"
@@ -111,7 +114,11 @@
 
 <script>
 import bannerApi from '@/api/cms/banner'
+import {mapGetters} from "vuex";
+import permission from "@/directive/permission/permission";
+
 export default {
+  directives: {permission},
   data() {
     return {
       listLoading: true, // 数据是否正在加载
@@ -123,6 +130,12 @@ export default {
       multipleSelection: [] // 批量选择中选择的记录列表
     }
   },
+  computed:{
+    ...mapGetters([
+      'id',
+      'buttons'
+    ])
+  },
   // 生命周期函数：内存准备完毕，页面尚未渲染
   created() {
     this.getBannerList()
@@ -132,6 +145,9 @@ export default {
     console.log('list mounted......')
   },
   methods: {
+    editBanner(id){
+      this.$router.push({path:`/cms/banner/update/${id}`})
+    },
     // 当页码发生改变的时候
     changeSize(size) {
       console.log(size)
@@ -210,14 +226,14 @@ export default {
       }).then(() => { // promise
         // 点击确定，远程调用ajax
         // 遍历selection，将id取出放入id列表
-        var idList = []
+        let idList = [];
         this.multipleSelection.forEach(item => {
           idList.push(item.id)
           // console.log(idList)
         })
         // 调用api
         bannerApi.removeBanner(idList)
-          .then((response) => {
+          .then(() => {
               this.$message({
                 type: 'success',
                 message: '删除成功!'

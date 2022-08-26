@@ -65,7 +65,7 @@
 
     <!-- 表格列表 -->
     <el-table
-      :data="list"
+      :data="memberList.records"
       stripe
       style="width: 100%"
     >
@@ -116,7 +116,7 @@
             type="danger"
             size="mini"
             icon="el-icon-delete"
-            @click="removememberById(scope.row.id)"
+            @click="removeMemberById(scope.row.id)"
           >
             删除
           </el-button>
@@ -147,7 +147,9 @@ export default{
   // },
   data() {
     return {
-      list:null,
+      memberList: {
+        records: [],
+      },
       page:1,
       limit: 5,
       total: 0,
@@ -169,10 +171,7 @@ export default{
       .then(response => {
         // console.log(response)
           console.log("=======")
-          this.list = response.data.row
-          this.total = response.data.total
-          console.log(this.list)
-          console.log(this.total)
+          this.memberList= response.data
 
 
       })
@@ -182,7 +181,7 @@ export default{
       this.memberQuery={}
       this.getList()
     },
-    removememberById(id){
+    removeMemberById(id){
 
         this.$confirm('此操作将删除讲师的记录,是否继续？', '提示', {
           confirmButtonText: '确定',

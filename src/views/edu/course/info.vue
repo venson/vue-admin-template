@@ -3,16 +3,26 @@
     <h2 style="text-align: center">
       发布新课程
     </h2>
+
     <el-steps
       :active="1"
       process-status="wait"
       align-center
-      style="margin: bottom 4px"
+      style="margin-bottom: 4px"
       finish-status="success"
     >
-      <el-step title="填写课程基本信息" />
-      <el-step title="创建课程大纲" />
-      <el-step title="最终发布" />
+      <el-step
+        title="Course Base Info"
+        @click.native="hasPerm('course.edit.info') && stepOne "
+      />
+      <el-step
+        title="Edit Course"
+        @click.native="hasPerm('course.edit.content') && stepTwo"
+      />
+      <el-step
+        title="Preview"
+        @click.native="hasPerm('course.edit.preview') && stepThree"
+      />
     </el-steps>
 
     <el-form label-width="120px">
@@ -97,6 +107,7 @@
             v-if="courseInfo.cover"
             :src="courseInfo.cover"
             class="avatar"
+            alt="Image Not Found"
           >
           <i
             v-else
@@ -116,6 +127,7 @@
       </el-form-item> -->
       <el-form-item>
         <el-button
+          v-permission="['course.edit.info']"
           :disabled="saveBtnDisabled"
           type="primary"
           @click="next"
@@ -130,22 +142,11 @@
 <script>
 import course from '@/api/edu/course'
 import subject from '@/api/edu/subject'
-// import { mavonEditor } from 'mavon-editor'
-// import 'mavon-editor/dist/css/index.css'
-// import MarkdownItVue from 'markdown-it-vue'
-// import 'markdown-it-vue/dist/markdown-it-vue.css'
-// import '@toast-ui/editor/dist/toastui-editor.css';
-// import { Editor } from '@toast-ui/vue-editor';
-// import '@toast-ui/editor/dist/toastui-editor-viewer.css';
-// import { Viewer } from '@toast-ui/vue-editor';
-// import MarkdownEditor from '@/components/MarkdownEditor'
-
-// import MarkdownEditor from '@/components/MarkdownEditor'
-
-// import mermaid from 'mermaid'
-// mermaid.initialize({startOnload:false})
+import {mapGetters} from "vuex";
+import permission from "@/directive/permission/permission";
 
 export default {
+  directives: { permission },
   data() {
     return {
       saveBtnDisabled: false,
@@ -167,22 +168,36 @@ export default {
       BASE_API: process.env.VUE_APP_BASE_API
     }
   },
+  computed:{
+    ...mapGetters([
+      'buttons',
+    ])},
   created() {
     if (this.$route.params && this.$route.params.id) {
       this.courseId = this.$route.params.id
       this.getInfo()
 
       // console.log(this.courseInfo)
-    } else {
+    }
       this.getTopSubject()
       this.getMemberList()
-    }
     // console.log(this.courseInfo.description)
     // console.log(this.viewerText)
   },
   methods: {
+
+    stepOne(){
+      this.$router.push({path: `/course/info/${this.courseId}`})
+    },
+    stepTwo(){
+      this.$router.push({path: `/course/content/${this.courseId}`})
+    },
+    stepThree(){
+      this.$router.push({path: `/course/preview/${this.courseId}`})
+    },
     updateCouseInfo() {
-      course.updateCouseInfo(this.courseInfo)
+      console.log(this.courseId)
+      course.updateCourseInfo(this.courseId,this.courseInfo)
     },
 
     getInfo() {
@@ -203,7 +218,7 @@ export default {
         })
       })
     },
-    handleAvatarSuccess(res, file) {
+    handleAvatarSuccess(res) {
       this.courseInfo.cover = res.data.url
     },
     beforeAvatarUpload(file) {
@@ -253,19 +268,19 @@ export default {
           message: '添加成功'
         })
         this.$router.push({
-          path: '/course/chapter/' + response.data.courseId
+          path: '/course/content/' + response.data.courseId
         })
       })
     },
     updateCourse() {
-      course.updateCourseInfo(this.courseInfo).then((response) => {
+      course.updateCourseInfo(this.courseId,this.courseInfo).then(() => {
         // console.log(this.courseInfo)
         this.$message({
           type: 'success',
           message: '修改成功'
         })
         this.$router.push({
-          path: '/course/chapter/' + this.courseId
+          path: '/course/content/' + this.courseId
         })
       })
     }

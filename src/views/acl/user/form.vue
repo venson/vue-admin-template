@@ -15,7 +15,7 @@
       <el-form-item label="用户昵称">
         <el-input v-model="user.nickName" />
       </el-form-item>
-     
+
       <el-form-item
         v-if="!user.id"
         label="用户密码"

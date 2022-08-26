@@ -19,6 +19,7 @@
         </el-form>
         <div>
           <el-button
+            v-permission="['activity.edit']"
             type="primary"
             size="mini"
             icon="el-icon-folder-checked"
@@ -27,12 +28,13 @@
             save
           </el-button>
           <el-button
+            v-permission="['activity.review.request']"
             type="primary"
             size="mini"
             icon="el-icon-collection"
-            @click="requestPublish"
+            @click="requestReviewDialog"
           >
-            Request
+            Request Review
           </el-button>
           <!-- Markdown editor -->
           <v-md-editor
@@ -48,6 +50,35 @@
         <!-- </el-container> -->
       </el-main>
     </el-container>
+
+    <el-dialog
+      title="Request Review"
+      :visible.sync="dialogReviewVisible"
+    >
+      <span>{{ dialogTitle }}</span>
+      <el-form :model="reviewVo">
+        <el-form-item
+          label="Message"
+          label-width="200"
+        >
+          <el-input
+            v-model="reviewVo.msg"
+            type="textarea"
+            autocomplete="off"
+          />
+        </el-form-item>
+      </el-form>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="reviewCancel">Cancel</el-button>
+        <el-button
+          type="primary"
+          @click="reviewConfirm"
+        >Confirm</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -58,9 +89,12 @@ import {mapGetters} from 'vuex'
 import permission from '@/directive/permission/index'
 
 export default {
-  directives: { permission },
+  directives: {permission},
   data() {
     return {
+      reviewVo: {},
+      dialogReviewVisible: false,
+      dialogTitle:'',
       activity: {},
       activityBack: '',
       lefttoolbar: "undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code",
@@ -80,33 +114,51 @@ export default {
       console.log(this.$route.params.id)
       this.activity.id = this.$route.params.id
       this.getActivity()
-    }else{
+    } else {
       this.activity.authorMemberName = this.name
       this.activity.authorMemberId = this.id
       this.activity.lastModifiedMemberId = this.id
       this.activity.lastModifiedMemberName = this.name
     }
+    this.reviewVo.id = this.id;
+    this.reviewVo.name = this.name;
   },
   methods: {
-        getActivity(){
-            activityApi.getActivity(this.activity.id)
-            .then(response =>{
-                this.activity = response.data.activity
-                this.activity.markdown = response.data.markdown.markdown
-                this.activityBack = Object.assign({},this.activity)
-                this.activity.lastModified
-                this.activity.lastModifiedMemberId = this.id
-                this.activity.lastModifiedMemberName = this.name
-                console.log(this.activity)
-            })
-        },
+    requestReviewDialog() {
+      this.dialogTitle = this.activity.title
+      this.dialogReviewVisible = true
+    },
+    reviewConfirm() {
+      console.log("request activity review")
+      activityApi.requestReviewByActivityId(this.activity.id, this.reviewVo)
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Request success'
+          })
+        })
+      this.dialogReviewVisible = false
+    },
+    reviewCancel() {
+      this.dialogReviewVisible = false
+    },
+    getActivity() {
+      activityApi.getActivity(this.activity.id)
+        .then(response => {
+          this.activity = response.data.activity
+          this.activity.markdown = response.data.markdown.markdown
+          this.activityBack = Object.assign({}, this.activity)
+          this.activity.lastModifiedMemberId = this.id
+          this.activity.lastModifiedMemberName = this.name
+          console.log(this.activity)
+        })
+    },
     handleUploadImage(event, insertImage, files) {
-
-      var formdata = new FormData()
-      formdata.append('file', files[0])
+      let formData = new FormData();
+      formData.append('file', files[0])
       let url = '';
       let desc = files[0].name;
-      ossApi.uploadImage(formdata)
+      ossApi.uploadImage(formData)
         .then(response => {
           url = response.data.url
           insertImage({
@@ -117,69 +169,45 @@ export default {
 
     },
 
-    modifiedCheck(){
+    modifiedCheck() {
       return this.activity === this.activityBack
     },
-
-        saveActivity(){
-          console.log(this.activity)
-          console.log(this.activityBack)
-            if(this.modifiedCheck()){
-                this.$message({
-                    type: 'info',
-                    message: 'No modification'
-                })
-                return 
-            }
-            if(this.activity.id ==null){
-            activityApi.addActivity(this.activity)
-            .then((response) =>{
-              console.log(response)
-                this.$message({
-                    type: 'success',
-                    message: 'Add Activity successed'
-                })
-                this.activity.id = response.data.id
-                console.log(this.activity)
-
-
-                this.activityBack = Object.assign({},this.activity)
+    saveActivity() {
+      console.log(this.activity)
+      console.log(this.activityBack)
+      if (this.modifiedCheck()) {
+        this.$message({
+          type: 'info',
+          message: 'No modification'
+        })
+        return
+      }
+      if (this.activity.id == null) {
+        activityApi.addActivity(this.activity)
+          .then((response) => {
+            console.log(response)
+            this.$message({
+              type: 'success',
+              message: 'Add Activity successed'
             })
-            }else{
-            activityApi.updateActivity(this.activity.id, this.activity)
-            .then(() =>{
-                this.$message({
-                    type: 'success',
-                    message: 'Add Activity successed'
-                })
-                this.activityBack = this.activity
-            })
-            }
-        },
+            this.activity.id = response.data.id
+            console.log(this.activity)
 
-        requestPublish(){
-            if(!this.activity.id){
-              this.$message({
-                type: 'warning',
-                message: 'Please save before request'
-              })
-              return 
-            }
-            if(this.activity.publishRequest){
-                this.$message({
-                    type: 'info',
-                    message: 'Request already applied'
-                })
-                return 
-            }
-            activityApi.requestPublish(this.activity.id)
-            .then(()=> {
-                this.$message({
-                    type: 'success',
-                    message: 'Request applied'
-                })
+
+            this.activityBack = Object.assign({}, this.activity)
+          })
+      } else {
+        activityApi.updateActivity(this.activity.id, this.activity)
+          .then(() => {
+            this.$message({
+              type: 'success',
+              message: 'Add Activity successed'
             })
-        }
+            this.activityBack = this.activity
+          })
+      }
+    },
+
   }
 }
 

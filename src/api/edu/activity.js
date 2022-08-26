@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const activityUrl='/eduservice/edu-activity'
+const activityUrl='/eduservice/admin/edu-activity'
 
 export default {
     getPageActivity(page, limit, filter){
@@ -38,26 +38,29 @@ export default {
 
     getPageRequestList(page,limit){
         return request({
-            url: `${activityUrl}/publish/${page}/${limit}`,
+            url: `${activityUrl}/review/${page}/${limit}`,
             method: 'get',
         })
     },
-    requestPublish(id){
+    requestReviewByActivityId(id, reviewVo){
         return request({
-            url: `${activityUrl}/publish/${id}`,
+            url: `${activityUrl}/review/${id}`,
             method: 'post',
+          data: reviewVo,
         })
     },
-    publish(id){
+    passReviewByActivityId(id, reviewVo){
         return request({
-            url: `${activityUrl}/publish/${id}`,
+            url: `${activityUrl}/review/${id}`,
             method: 'put',
+            data: reviewVo,
         })
     },
-    reject(id){
+    rejectReviewByActivityId(id, reviewVo){
         return request({
-            url: `${activityUrl}/publish/${id}`,
-            method: 'delete',
+            url: `${activityUrl}/review/reject/${id}`,
+          data: reviewVo,
+            method: 'post',
         })
     },
 
